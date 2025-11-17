@@ -1,4 +1,4 @@
-package modelo;
+package com.example.demo.modelo;
 
 public class Servicio {
     private Long id;
