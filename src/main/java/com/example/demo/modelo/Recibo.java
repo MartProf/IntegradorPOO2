@@ -1,18 +1,10 @@
-<<<<<<< HEAD
-/*
-
 package com.example.demo.modelo;
 
-public class Plan {
-=======
-package com.example.demo.modelo;
-
-import java.util.Set;
+import java.time.LocalDate;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -27,33 +19,17 @@ import lombok.ToString;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-public class Plan {
+public class Recibo 
+{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
->>>>>>> origin/pike
     private Long id;
-    private String nombre;
-    private double precioBase;
-
-<<<<<<< HEAD
-    public Plan(Long id, String nombre, double precioBase) {
-        this.id = id;
-        this.nombre = nombre;
-        this.precioBase = precioBase;
-    }
-
-    public double getPrecioBase() {
-        return precioBase;
-    }
+    private LocalDate fechaEmision;
+    private String concepto;
+    private Double montoPagado;
     
-}
+    // MÉTODO DE NEGOCIO (HU 1.6)
+    public String generarDetalle() { /* ... */ return ""; }
 
- */
-=======
-    // Relación 1-N con ServicioContratado
-    @OneToMany
-    private Set<ServicioContratado> contratos;
 }
-
->>>>>>> origin/pike

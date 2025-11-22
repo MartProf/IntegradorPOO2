@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*
 
 package com.example.demo.modelo;
@@ -8,3 +9,11 @@ public enum EstadoCuenta {
 
 }
  */
+=======
+package com.example.demo.modelo;
+
+public enum EstadoCuenta {
+    ACTIVA,
+    INACTIVA,
+}
+>>>>>>> origin/pike

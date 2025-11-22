@@ -1,26 +1,6 @@
-<<<<<<< HEAD
-
-/*
 package com.example.demo.modelo;
 
-public class ItemPago {
-    private double monto;
-    private String referencia;
-
-    public ItemPago(double monto, String referencia) {
-        this.monto = monto;
-        this.referencia = referencia;
-    }
-
-    public double getMonto() {
-        return monto;
-    }
-}
-
- */
-=======
-package com.example.demo.modelo;
-
+import java.time.LocalDate;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -40,20 +20,28 @@ import lombok.ToString;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-public class ItemPago  
+public class NotaCredito 
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
+    private String numero;
+    private LocalDate fechaEmision;
+    private Double montoTotalCredito;
+    private String motivo; // Registro Obligatorio del motivo
 
-    private Double monto;
-    private String referencia;
-    
-    // Relación N-1 con Pago
+    // Relación N-1 (CLAVE PARA TRAZABILIDAD)
     @ManyToOne
-    private Pago pago; 
-    // Relación N-1 con MedioPago (enum)
-    private MedioPago medioPago;
+    private Factura facturaAnulada; 
+    
+    // Relación N-1 con CuentaCliente
+    @ManyToOne
+    private CuentaCliente cuentaCliente; 
+
+    // MÉTODO DE NEGOCIO (HU 1.7)
+    public void generar(Factura factura, String motivo) { 
+        // Lógica: Actualiza estado de Factura, llama a CuentaCliente.revertirDeuda()
+    }
+
 }
->>>>>>> origin/pike
