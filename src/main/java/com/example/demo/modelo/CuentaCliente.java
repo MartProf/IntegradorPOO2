@@ -1,3 +1,4 @@
+/*
 package com.example.demo.modelo;
 
 public class CuentaCliente {
@@ -11,3 +12,4 @@ public class CuentaCliente {
     }
 
 }
+ */

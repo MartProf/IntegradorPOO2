@@ -1,3 +1,5 @@
+
+/*
 package com.example.demo.modelo;
 public enum EstadoFactura {
     PENDIENTE, 
@@ -6,3 +8,4 @@ public enum EstadoFactura {
     ANULADA,
 
 }
+ */

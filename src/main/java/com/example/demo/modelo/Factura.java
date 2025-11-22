@@ -1,3 +1,5 @@
+/*
+
 package com.example.demo.modelo;
 
 import java.math.BigDecimal;
@@ -6,16 +8,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Factura con capacidad para:
- * - agregar detalles (líneas),
- * - calcular subtotales, IVA por línea y total,
- * - anular la factura (cambiar estado y registrar motivo).
- *
- * Notas:
- * - Todo cálculo monetario usa BigDecimal.
- * - Se delega a CondicionFiscal la decisión de cuanto IVA corresponde calcular para un determinado monto (Strategy).
- */
+
 public class Factura {
 
     private Long id;
@@ -39,14 +32,14 @@ public class Factura {
         this.fechaVencimiento = fechaVencimiento;
     }
 
-    /**
+    
      * Agrega una línea a la factura a partir de un ServicioContratado y la cantidad.
      * Calcula el subtotal neto (precio * cantidad), luego consulta a la CondicionFiscal del cliente
      * para determinar cuánto IVA se aplica sobre ese subtotal.
      *
      * @param servicioContratado servicio contratado (contiene el servicio y precio personalizado)
      * @param cantidad cantidad de unidades
-     */
+     
     public void agregarDetalleDesdeServicioContratado(ServicioContratado servicioContratado, int cantidad) {
         // 1) Determinar precio unitario: si existe precio personalizado (>0), lo usamos; si no, usamos el precio base del servicio.
         double precioFinal = servicioContratado.getPrecioFinal();
@@ -82,10 +75,10 @@ public class Factura {
         calcularTotales();
     }
 
-    /**
+    
      * Recalcula subtotalNeto, ivaTotal y montoTotal a partir de la lista de detalles.
      * Debe llamarse después de cualquier modificación de detalles.
-     */
+     
     public void calcularTotales() {
         BigDecimal subtotal = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
         BigDecimal iva = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
@@ -103,7 +96,7 @@ public class Factura {
     /**
      * Anula la factura: registra motivo y cambia estado a ANULADA.
      * @param motivo texto explicativo
-     */
+     
     public void anular(String motivo) {
         this.motivoAnulacion = motivo;
         this.estado = EstadoFactura.ANULADA;
@@ -120,3 +113,4 @@ public class Factura {
     public String getNumero() { return numero; }
     public LocalDate getFechaEmision() { return fechaEmision; }
 }
+ */

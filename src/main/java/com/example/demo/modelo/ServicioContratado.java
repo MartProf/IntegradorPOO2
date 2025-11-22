@@ -1,3 +1,5 @@
+/*
+
 package com.example.demo.modelo;
 
 public class ServicioContratado {
@@ -19,3 +21,4 @@ public class ServicioContratado {
         return servicio;
     }
 }
+ */

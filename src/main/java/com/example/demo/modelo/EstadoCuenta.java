@@ -1,3 +1,5 @@
+/*
+
 package com.example.demo.modelo;
 public enum EstadoCuenta {
     ACTIVA, 
@@ -5,3 +7,4 @@ public enum EstadoCuenta {
 
 
 }
+ */

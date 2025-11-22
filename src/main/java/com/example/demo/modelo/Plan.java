@@ -1,3 +1,5 @@
+/*
+
 package com.example.demo.modelo;
 
 public class Plan {
@@ -14,5 +16,7 @@ public class Plan {
     public double getPrecioBase() {
         return precioBase;
     }
+    
 }
 
+ */

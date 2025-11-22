@@ -1,3 +1,5 @@
+/*
+
 package com.example.demo.modelo;
 
 public enum MedioPago {
@@ -7,3 +9,4 @@ public enum MedioPago {
 
 
 }
+ */

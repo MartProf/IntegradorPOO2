@@ -1,3 +1,5 @@
+
+/*
 package com.example.demo.modelo;
 
 public class ItemPago {
@@ -14,3 +16,4 @@ public class ItemPago {
     }
 }
 
+ */

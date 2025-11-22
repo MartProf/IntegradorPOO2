@@ -1,3 +1,4 @@
+/*
 package com.example.demo.modelo;
 
 import java.math.BigDecimal;
@@ -6,7 +7,7 @@ import java.math.RoundingMode;
 /**
  * Representa una línea de factura: cantidad * precio unitario (neto), monto de IVA y total de la línea.
  * Todas las operaciones monetarias se hacen con BigDecimal y RoundingMode.HALF_UP.
- */
+
 public class DetalleFactura {
 
     private int cantidad;
@@ -38,3 +39,4 @@ public class DetalleFactura {
     public String getDescripcionServicio() { return descripcionServicio; }
     public BigDecimal getAlicuotaAplicada() { return alicuotaAplicada; }
 }
+ */

@@ -1,3 +1,4 @@
+/*
 package com.example.demo.modelo;
 
 public class Cliente {
@@ -21,3 +22,5 @@ public class Cliente {
         return condicionIVA;
     }
 }
+
+ */

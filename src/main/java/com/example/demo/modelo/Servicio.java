@@ -1,12 +1,13 @@
+/*
 package com.example.demo.modelo;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 
-/**
+
  * Representa un servicio ofrecido por la empresa.
  * Ahora el precio está en BigDecimal para preservar precisión monetaria.
- */
+
 public class Servicio {
     private Long id;
     private String nombre;
@@ -35,3 +36,4 @@ public class Servicio {
         return nombre;
     }
 }
+ */

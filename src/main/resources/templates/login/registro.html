@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - SGFS</title>
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body>
+
+<div class="auth-container">
+    <div class="auth-header">
+        <h2>Crear Cuenta</h2>
+        <p>Completa el formulario para registrarte</p>
+    </div>
+
+    <!-- Mensaje de error si el usuario ya existe -->
+    <div th:if="${param.error}" class="alert alert-error">
+        <strong>Error:</strong> El nombre de usuario ya está en uso.
+    </div>
+
+    <div th:if="${param.invalid}" class="alert alert-error">
+        <strong>Error:</strong> Los datos ingresados no son válidos.
+    </div>
+
+    <form th:action="@{/registro}" th:object="${usuario}" method="post" id="registroForm">
+        <div class="form-group">
+            <label for="username">
+                Nombre de Usuario
+                <span class="required-mark">*</span>
+            </label>
+            <input 
+                type="text" 
+                id="username" 
+                th:field="*{username}" 
+                placeholder="Elige un nombre de usuario"
+                required 
+                autofocus
+                autocomplete="username"
+                minlength="3"
+                maxlength="50"
+                pattern="[a-zA-Z0-9_]+"
+                title="Solo letras, números y guión bajo" />
+            <small class="form-help-text">
+                Mínimo 3 caracteres. Solo letras, números y guión bajo.
+            </small>
+        </div>
+
+        <div class="form-group">
+            <label for="password">
+                Contraseña
+                <span class="required-mark">*</span>
+            </label>
+            <div class="password-toggle">
+                <input 
+                    type="password" 
+                    id="password" 
+                    th:field="*{password}" 
+                    placeholder="Crea una contraseña segura"
+                    required
+                    autocomplete="new-password"
+                    minlength="6"
+                    maxlength="100" />
+                <button type="button" class="password-toggle-btn" onclick="togglePassword('password')">
+                    👁️
+                </button>
+            </div>
+            <small class="form-help-text">
+                Mínimo 6 caracteres.
+            </small>
+        </div>
+
+        <div class="form-group">
+            <label for="confirmPassword">
+                Confirmar Contraseña
+                <span class="required-mark">*</span>
+            </label>
+            <div class="password-toggle">
+                <input 
+                    type="password" 
+                    id="confirmPassword" 
+                    name="confirmPassword"
+                    placeholder="Repite tu contraseña"
+                    required
+                    autocomplete="new-password"
+                    minlength="6"
+                    maxlength="100" />
+                <button type="button" class="password-toggle-btn" onclick="togglePassword('confirmPassword')">
+                    👁️
+                </button>
+            </div>
+            <small class="form-help-text" id="passwordMatch"></small>
+        </div>
+
+        <button type="submit" class="btn btn-success">Crear Cuenta</button>
+    </form>
+
+    <div class="auth-footer">
+        <p>
+            ¿Ya tienes cuenta? 
+            <a th:href="@{/login}">Inicia sesión aquí</a>
+        </p>
+    </div>
+</div>
+
+<script>
+    function togglePassword(fieldId) {
+        const passwordInput = document.getElementById(fieldId);
+        const toggleBtn = passwordInput.parentElement.querySelector('.password-toggle-btn');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleBtn.textContent = '🙈';
+        } else {
+            passwordInput.type = 'password';
+            toggleBtn.textContent = '👁️';
+        }
+    }
+
+    // Validación de coincidencia de contraseñas en tiempo real
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirmPassword');
+    const matchText = document.getElementById('passwordMatch');
+
+    function checkPasswordMatch() {
+        if (confirmPassword.value === '') {
+            matchText.textContent = '';
+            matchText.style.color = '';
+            confirmPassword.classList.remove('error');
+            return;
+        }
+        
+        if (password.value === confirmPassword.value) {
+            matchText.textContent = '✓ Las contraseñas coinciden';
+            matchText.style.color = '#28a745';
+            confirmPassword.classList.remove('error');
+        } else {
+            matchText.textContent = '✗ Las contraseñas no coinciden';
+            matchText.style.color = '#e74c3c';
+            confirmPassword.classList.add('error');
+        }
+    }
+
+    password.addEventListener('input', checkPasswordMatch);
+    confirmPassword.addEventListener('input', checkPasswordMatch);
+
+    // Validación del formulario antes de enviar
+    document.getElementById('registroForm').addEventListener('submit', function(e) {
+        const usernameValue = document.getElementById('username').value.trim();
+        const passwordValue = password.value;
+        const confirmPasswordValue = confirmPassword.value;
+        
+        // Validar nombre de usuario
+        if (usernameValue.length < 3) {
+            e.preventDefault();
+            alert('El nombre de usuario debe tener al menos 3 caracteres');
+            return;
+        }
+        
+        if (!/^[a-zA-Z0-9_]+$/.test(usernameValue)) {
+            e.preventDefault();
+            alert('El nombre de usuario solo puede contener letras, números y guión bajo');
+            return;
+        }
+        
+        // Validar contraseña
+        if (passwordValue.length < 6) {
+            e.preventDefault();
+            alert('La contraseña debe tener al menos 6 caracteres');
+            return;
+        }
+        
+        // Validar coincidencia de contraseñas
+        if (passwordValue !== confirmPasswordValue) {
+            e.preventDefault();
+            alert('Las contraseñas no coinciden');
+            confirmPassword.focus();
+            return;
+        }
+        
+        // Añadir efecto de carga al botón
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.classList.add('loading');
+        submitBtn.disabled = true;
+    });
+
+    // Validar caracteres en tiempo real para el username
+    document.getElementById('username').addEventListener('input', function(e) {
+        const value = e.target.value;
+        const validValue = value.replace(/[^a-zA-Z0-9_]/g, '');
+        if (value !== validValue) {
+            e.target.value = validValue;
+        }
+    });
+</script>
+
+</body>
+</html>

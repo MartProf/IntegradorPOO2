@@ -1,3 +1,5 @@
+
+/*
 package com.example.demo.modelo;
 
 import java.time.LocalDate;
@@ -16,3 +18,4 @@ public class Pago {
     }
 }
 
+ */
