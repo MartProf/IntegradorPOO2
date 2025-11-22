@@ -1,10 +1,6 @@
 package com.example.demo.modelo;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -13,6 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
+@Table(name = "clientes")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,14 +21,21 @@ public class Cliente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
+    
     @ToString.Include
     private String razonSocial;
+    
+    @Column(unique = true, nullable = false)
     private String cuitDni;
+    
     private String domicilio;
     private String contacto;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private CondicionFiscal condicionIVA;
     
-    // Relación 1-1 con CuentaCliente
-    @OneToOne
+    // Relación 1-1 con CuentaCliente (Cliente es dueño)
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "cliente")
     private CuentaCliente cuentaCliente;
 }

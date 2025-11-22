@@ -1,31 +1,6 @@
-<<<<<<< HEAD
-
-/*
 package com.example.demo.modelo;
 
-public class ItemPago {
-    private double monto;
-    private String referencia;
-
-    public ItemPago(double monto, String referencia) {
-        this.monto = monto;
-        this.referencia = referencia;
-    }
-
-    public double getMonto() {
-        return monto;
-    }
-}
-
- */
-=======
-package com.example.demo.modelo;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -34,6 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
+@Table(name = "items_pago")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -47,13 +23,18 @@ public class ItemPago
     @EqualsAndHashCode.Include
     private Long id;
 
+    @Column(nullable = false)
     private Double monto;
+    
     private String referencia;
     
     // Relación N-1 con Pago
     @ManyToOne
+    @JoinColumn(name = "pago_id", nullable = false)
     private Pago pago; 
-    // Relación N-1 con MedioPago (enum)
+    
+    // Relación con MedioPago (enum)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private MedioPago medioPago;
 }
->>>>>>> origin/pike

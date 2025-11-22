@@ -1,37 +1,9 @@
-<<<<<<< HEAD
-
-/*
 package com.example.demo.modelo;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
-public class Pago {
-    private Long id;
-    private LocalDate fechaPago = LocalDate.now();
-    private double montoPagadoTotal;
-    private List<ItemPago> items = new ArrayList<>();
-
-    public void registrarPago(double monto, MedioPago medio) {
-        items.add(new ItemPago(monto, medio.name()));
-        montoPagadoTotal += monto;
-    }
-}
-
- */
-=======
-package com.example.demo.modelo;
-
-import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -40,6 +12,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
+@Table(name = "pagos")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -52,20 +25,25 @@ public class Pago
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
-    private LocalDate fechaPago;
-    private Double montoPagadoTotal;
     
-    // Relación N-1 con Factura
+    @Column(nullable = false)
+    private LocalDate fechaPago;
+    
+    @Column(nullable = false)
+    private Double montoPagadoTotal = 0.0;
+    
+    // Según diagrama: pago "sale de" CuentaCliente e "incluye pagos parciales"
     @ManyToOne
-    private Factura factura;
-    // Relación N-1 con CuentaCliente
-    @ManyToOne
+    @JoinColumn(name = "cuenta_cliente_id", nullable = false)
     private CuentaCliente cuentaCliente; 
+    
     // Relación 1-N con ItemPago (Pagos parciales/múltiples medios)
-    @OneToMany
-    private Set<ItemPago> itemsPago; 
+    @OneToMany(mappedBy = "pago", cascade = CascadeType.ALL)
+    private Set<ItemPago> itemsPago = new HashSet<>();
+    
     // Relación 1-1 con Recibo
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "recibo_id", unique = true)
     private Recibo recibo; 
 
     // MÉTODO DE NEGOCIO (HU 1.5)
@@ -73,4 +51,3 @@ public class Pago
         // Lógica: crea ItemPago y actualiza Factura y CuentaCliente
     }
 }
->>>>>>> origin/pike

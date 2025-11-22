@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
+@Table(name = "usuarios")
 @Data
 @NoArgsConstructor
 public class Usuario implements UserDetails { // Implementar UserDetails es la clave

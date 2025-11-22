@@ -1,37 +1,7 @@
-<<<<<<< HEAD
-/*
-
-package com.example.demo.modelo;
-
-public class ServicioContratado {
-    private Servicio servicio;
-    private double precioPersonalizado;
-    private int periodoFacturacionMes;
-
-    public ServicioContratado(Servicio servicio, double precioPersonalizado, int periodoFacturacionMes) {
-        this.servicio = servicio;
-        this.precioPersonalizado = precioPersonalizado;
-        this.periodoFacturacionMes = periodoFacturacionMes;
-    }
-
-    public double getPrecioFinal() {
-        return precioPersonalizado;
-    }
-
-    public Servicio getServicio() {
-        return servicio;
-    }
-}
- */
-=======
 package com.example.demo.modelo;
 
 import java.time.LocalDate;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -40,6 +10,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
+@Table(name = "servicios_contratados")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -53,23 +24,31 @@ public class ServicioContratado {
     private Long id;
 
     private Double precioPersonalizado;
-    private Double montoDescuento;
+    
+    private Double montoDescuento = 0.0;
+    
+    @Column(nullable = false)
     private LocalDate fechaInicio;
     
     // Relación N-1 con CuentaCliente
     @ManyToOne
+    @JoinColumn(name = "cuenta_cliente_id", nullable = false)
     private CuentaCliente cuentaCliente; 
+    
     // Relación N-1 con Servicio
     @ManyToOne
+    @JoinColumn(name = "servicio_id", nullable = false)
     private Servicio servicio;
+    
     // Relación N-1 con Plan
     @ManyToOne
+    @JoinColumn(name = "plan_id")
     private Plan plan;
     
     // MÉTODO DE NEGOCIO
     public Double calcularPrecioFinal() { 
-        // Lógica de precioBase - montoDescuento
-        return 0.0; 
+        Double precioBase = (precioPersonalizado != null) ? precioPersonalizado : 
+                           (plan != null ? plan.getPrecioBase() : servicio.getPrecioBase());
+        return precioBase - (montoDescuento != null ? montoDescuento : 0.0);
     }
 }
->>>>>>> origin/pike

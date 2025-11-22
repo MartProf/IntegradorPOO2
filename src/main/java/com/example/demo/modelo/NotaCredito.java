@@ -1,11 +1,7 @@
 package com.example.demo.modelo;
 
 import java.time.LocalDate;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -14,6 +10,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
+@Table(name = "notas_credito")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,22 +23,35 @@ public class NotaCredito
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
+    
+    @Column(unique = true, nullable = false)
     private String numero;
+    
+    @Column(nullable = false)
     private LocalDate fechaEmision;
+    
+    @Column(nullable = false)
     private Double montoTotalCredito;
+    
+    @Column(nullable = false, length = 500)
     private String motivo; // Registro Obligatorio del motivo
 
-    // Relación N-1 (CLAVE PARA TRAZABILIDAD)
-    @ManyToOne
+    // Relación 1-1 con Factura (CLAVE PARA TRAZABILIDAD)
+    @OneToOne
+    @JoinColumn(name = "factura_anulada_id", unique = true, nullable = false)
     private Factura facturaAnulada; 
     
     // Relación N-1 con CuentaCliente
     @ManyToOne
+    @JoinColumn(name = "cuenta_cliente_id", nullable = false)
     private CuentaCliente cuentaCliente; 
 
     // MÉTODO DE NEGOCIO (HU 1.7)
     public void generar(Factura factura, String motivo) { 
-        // Lógica: Actualiza estado de Factura, llama a CuentaCliente.revertirDeuda()
+        this.facturaAnulada = factura;
+        this.motivo = motivo;
+        this.montoTotalCredito = factura.getMontoTotalFinal();
+        factura.setEstado(EstadoFactura.ANULADA_POR_NC);
+        cuentaCliente.revertirDeuda(montoTotalCredito);
     }
-
 }
