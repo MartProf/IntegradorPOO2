@@ -51,6 +51,10 @@ public class Factura
     @OneToMany(mappedBy = "factura", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<DetalleFactura> detalles = new HashSet<>();
     
+    // Relación 1-N con Pago (una factura puede tener múltiples pagos parciales)
+    @OneToMany(mappedBy = "factura")
+    private Set<Pago> pagos = new HashSet<>();
+    
     // Relación 1-1 con NotaCredito (Opcional, para navegación)
     @OneToOne(mappedBy = "facturaAnulada")
     private NotaCredito notaCredito; 

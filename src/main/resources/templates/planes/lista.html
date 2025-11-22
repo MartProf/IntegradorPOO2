@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planes - SGFS</title>
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <a th:href="@{/dashboard}">
+                    <span class="logo">📊 SGFS</span>
+                </a>
+            </div>
+            
+            <div class="navbar-menu">
+                <a th:href="@{/dashboard}" class="nav-item">
+                    🏠 Inicio
+                </a>
+                <a th:href="@{/clientes}" class="nav-item">
+                    👥 Clientes
+                </a>
+                <a th:href="@{/facturas}" class="nav-item">
+                    📄 Facturas
+                </a>
+                <a th:href="@{/pagos}" class="nav-item">
+                    💳 Pagos
+                </a>
+                <a th:href="@{/servicios}" class="nav-item">
+                    🔧 Servicios
+                </a>
+            </div>
+            
+            <div class="navbar-user">
+                <span class="user-info" th:text="${#authentication.name}">Usuario</span>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="btn-logout">🚪 Salir</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1>Gestión de Planes</h1>
+                <a th:href="@{/planes/nuevo}" class="btn btn-primary">➕ Nuevo Plan</a>
+            </div>
+
+            <!-- Mensajes -->
+            <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}"></div>
+            <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+            <!-- Tabla de planes -->
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Precio Base</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${planes.isEmpty()}">
+                            <td colspan="4" style="text-align: center; padding: 2rem; color: #666;">
+                                No hay planes registrados
+                            </td>
+                        </tr>
+                        <tr th:each="plan : ${planes}">
+                            <td th:text="${plan.id}">1</td>
+                            <td th:text="${plan.nombre}">Plan Básico</td>
+                            <td th:text="${'$' + #numbers.formatDecimal(plan.precioBase, 1, 2)}">$5000.00</td>
+                            <td>
+                                <a th:href="@{/planes/editar/{id}(id=${plan.id})}" class="btn-action btn-edit">✏️ Editar</a>
+                                <a th:href="@{/planes/eliminar/{id}(id=${plan.id})}" 
+                                   class="btn-action btn-delete"
+                                   onclick="return confirm('¿Está seguro de eliminar este plan?')">
+                                   🗑️ Eliminar
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 SGFS - Sistema de Gestión de Facturación de Servicios</p>
+        </div>
+    </footer>
+
+    <style>
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            color: var(--dark-color);
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table thead {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        .data-table tbody tr {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table tbody tr:hover {
+            background-color: var(--light-color);
+        }
+
+        .btn-action {
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 0 4px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit {
+            background-color: #f0ad4e;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background-color: #ec971f;
+        }
+
+        .btn-delete {
+            background-color: #d9534f;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: #c9302c;
+        }
+    </style>
+</body>
+</html>
