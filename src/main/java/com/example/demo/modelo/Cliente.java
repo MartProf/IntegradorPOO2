@@ -1,23 +1,37 @@
 package com.example.demo.modelo;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
 public class Cliente {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
+    @ToString.Include
     private String razonSocial;
     private String cuitDni;
     private String domicilio;
     private String contacto;
     private CondicionFiscal condicionIVA;
-
-    public Cliente(Long id, String razonSocial, String cuitDni, String domicilio, String contacto, CondicionFiscal condicionIVA) {
-        this.id = id;
-        this.razonSocial = razonSocial;
-        this.cuitDni = cuitDni;
-        this.domicilio = domicilio;
-        this.contacto = contacto;
-        this.condicionIVA = condicionIVA;
-    }
-
-    public CondicionFiscal getCondicionIVA() {
-        return condicionIVA;
-    }
+    
+    // Relación 1-1 con CuentaCliente
+    @OneToOne
+    private CuentaCliente cuentaCliente;
 }

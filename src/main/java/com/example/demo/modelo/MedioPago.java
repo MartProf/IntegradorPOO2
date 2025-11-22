@@ -1,5 +1,9 @@
 package com.example.demo.modelo;
 
-public enum MedioPago {
-
+public enum MedioPago 
+{
+    TRANSFERENCIA,
+    TARJETA,
+    EFECTIVO,
+    DEBITO
 }

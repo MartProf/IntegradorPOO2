@@ -20,29 +20,28 @@ import lombok.ToString;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-public class ServicioContratado {
+public class NotaCredito 
+{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
+    private String numero;
+    private LocalDate fechaEmision;
+    private Double montoTotalCredito;
+    private String motivo; // Registro Obligatorio del motivo
 
-    private Double precioPersonalizado;
-    private Double montoDescuento;
-    private LocalDate fechaInicio;
+    // Relación N-1 (CLAVE PARA TRAZABILIDAD)
+    @ManyToOne
+    private Factura facturaAnulada; 
     
     // Relación N-1 con CuentaCliente
     @ManyToOne
     private CuentaCliente cuentaCliente; 
-    // Relación N-1 con Servicio
-    @ManyToOne
-    private Servicio servicio;
-    // Relación N-1 con Plan
-    @ManyToOne
-    private Plan plan;
-    
-    // MÉTODO DE NEGOCIO
-    public Double calcularPrecioFinal() { 
-        // Lógica de precioBase - montoDescuento
-        return 0.0; 
+
+    // MÉTODO DE NEGOCIO (HU 1.7)
+    public void generar(Factura factura, String motivo) { 
+        // Lógica: Actualiza estado de Factura, llama a CuentaCliente.revertirDeuda()
     }
+
 }

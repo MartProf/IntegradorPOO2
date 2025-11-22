@@ -5,7 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -20,29 +19,17 @@ import lombok.ToString;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-public class ServicioContratado {
+public class Recibo 
+{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
+    private LocalDate fechaEmision;
+    private String concepto;
+    private Double montoPagado;
+    
+    // MÉTODO DE NEGOCIO (HU 1.6)
+    public String generarDetalle() { /* ... */ return ""; }
 
-    private Double precioPersonalizado;
-    private Double montoDescuento;
-    private LocalDate fechaInicio;
-    
-    // Relación N-1 con CuentaCliente
-    @ManyToOne
-    private CuentaCliente cuentaCliente; 
-    // Relación N-1 con Servicio
-    @ManyToOne
-    private Servicio servicio;
-    // Relación N-1 con Plan
-    @ManyToOne
-    private Plan plan;
-    
-    // MÉTODO DE NEGOCIO
-    public Double calcularPrecioFinal() { 
-        // Lógica de precioBase - montoDescuento
-        return 0.0; 
-    }
 }

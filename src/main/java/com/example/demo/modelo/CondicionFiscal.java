@@ -1,7 +1,6 @@
 package com.example.demo.modelo;
 
-public interface CondicionFiscal {
-
-    double calcularIVA(double montoBase);
-
+public enum CondicionFiscal 
+{
+    RESPONSABLE_INSCRIPTO
 }
