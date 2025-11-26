@@ -1,0 +1,52 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(title='Servicios', content=~{::#servicios-content}, styles=~{::servicios-styles})}">
+
+<div id="servicios-content">
+    <div class="page-header">
+        <h1>Gestión de Servicios</h1>
+        <a th:href="@{/servicios/nuevo}" class="btn btn-primary">➕ Nuevo Servicio</a>
+    </div>
+
+    <!-- Tabla de servicios -->
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Precio Base</th>
+                    <th>Alícuota IVA</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:if="${servicios.isEmpty()}">
+                    <td colspan="5" style="text-align: center; padding: 2rem; color: #666;">
+                        No hay servicios registrados
+                    </td>
+                </tr>
+                <tr th:each="servicio : ${servicios}">
+                    <td th:text="${servicio.id}">1</td>
+                    <td th:text="${servicio.nombre}">Internet 100Mb</td>
+                    <td th:text="${'$' + #numbers.formatDecimal(servicio.precioBase, 1, 2)}">$5000.00</td>
+                    <td th:text="${#numbers.formatDecimal(servicio.alicuotaIVA, 1, 2) + '%'}">21.00%</td>
+                    <td>
+                        <a th:href="@{/servicios/editar/{id}(id=${servicio.id})}" 
+                           class="btn-action btn-edit"
+                           title="Editar">✏️</a>
+                        <a th:href="@{/servicios/eliminar/{id}(id=${servicio.id})}" 
+                           class="btn-action btn-delete"
+                           title="Eliminar"
+                           onclick="return confirm('¿Está seguro de eliminar este servicio?')">🗑️</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<th:block th:fragment="servicios-styles">
+    <link rel="stylesheet" th:href="@{/css/servicios-lista.css}">
+</th:block>
+</html>
+

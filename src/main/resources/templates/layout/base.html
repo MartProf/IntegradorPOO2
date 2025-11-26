@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" 
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-      lang="es">
+      th:fragment="layout(title, content, styles)">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${titulo != null ? titulo + ' - SGFS' : 'SGFS - Sistema de Gestión de Facturación'}">SGFS</title>
+    <title th:text="${title != null ? title + ' - SGFS' : 'SGFS - Sistema de Gestión de Facturación'}">SGFS</title>
+    
+    <!-- CSS base del layout -->
     <link rel="stylesheet" th:href="@{/css/layout.css}">
-    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
-    <!-- Bloque para CSS adicional de páginas específicas -->
-    <th:block th:fragment="css"></th:block>
+    <!-- CSS específico de cada vista -->
+    <th:block th:insert="${styles}"></th:block>
 </head>
 <body>
     <!-- Navbar -->
@@ -22,26 +23,28 @@
             </div>
             
             <div class="navbar-menu">
-                <a th:href="@{/dashboard}" class="nav-item" th:classappend="${seccion == 'dashboard' ? 'active' : ''}">
+                <a th:href="@{/dashboard}" class="nav-item">
                     🏠 Inicio
                 </a>
-                <a th:href="@{/clientes}" class="nav-item" th:classappend="${seccion == 'clientes' ? 'active' : ''}">
+                <a th:href="@{/clientes}" class="nav-item">
                     👥 Clientes
                 </a>
-                <a th:href="@{/facturas}" class="nav-item" th:classappend="${seccion == 'facturas' ? 'active' : ''}">
+                <a th:href="@{/facturas}" class="nav-item">
                     📄 Facturas
                 </a>
-                <a th:href="@{/pagos}" class="nav-item" th:classappend="${seccion == 'pagos' ? 'active' : ''}">
+                <a th:href="@{/pagos}" class="nav-item">
                     💳 Pagos
                 </a>
-                <a th:href="@{/servicios}" class="nav-item" th:classappend="${seccion == 'servicios' ? 'active' : ''}">
+                <a th:href="@{/servicios}" class="nav-item">
                     🔧 Servicios
+                </a>
+                <a th:href="@{/planes}" class="nav-item">
+                    📦 Planes
                 </a>
             </div>
             
             <div class="navbar-user">
                 <span class="user-info" sec:authentication="name">Usuario</span>
-                <span class="user-role" sec:authentication="principal.authorities">[ROL]</span>
                 <form th:action="@{/logout}" method="post" style="display: inline;">
                     <button type="submit" class="btn-logout">🚪 Salir</button>
                 </form>
@@ -52,28 +55,21 @@
     <!-- Contenido principal -->
     <main class="main-content">
         <div class="container">
-            <!-- Breadcrumb opcional -->
-            <div th:if="${breadcrumb != null}" class="breadcrumb">
-                <span th:each="item, iterStat : ${breadcrumb}">
-                    <a th:if="${item.url != null}" th:href="${item.url}" th:text="${item.text}">Item</a>
-                    <span th:unless="${item.url != null}" th:text="${item.text}">Item</span>
-                    <span th:if="${!iterStat.last}" class="separator">›</span>
-                </span>
-            </div>
-            
             <!-- Mensajes de alerta -->
-            <div th:if="${mensaje != null}" class="alert alert-success">
+            <div th:if="${mensaje}" class="alert alert-success">
                 <span th:text="${mensaje}">Mensaje de éxito</span>
             </div>
             
-            <div th:if="${error != null}" class="alert alert-error">
+            <div th:if="${error}" class="alert alert-error">
                 <span th:text="${error}">Mensaje de error</span>
             </div>
             
-            <!-- Contenido de la página -->
-            <th:block th:fragment="content">
-                <!-- El contenido específico de cada página se insertará aquí -->
-            </th:block>
+            <div th:if="${success}" class="alert alert-success">
+                <span th:text="${success}">Mensaje de éxito</span>
+            </div>
+            
+            <!-- Contenido de cada página -->
+            <div th:replace="${content}"></div>
         </div>
     </main>
 
@@ -83,8 +79,5 @@
             <p>&copy; 2025 SGFS - Sistema de Gestión de Facturación de Servicios</p>
         </div>
     </footer>
-
-    <!-- Bloque para JavaScript adicional -->
-    <th:block th:fragment="scripts"></th:block>
 </body>
 </html>

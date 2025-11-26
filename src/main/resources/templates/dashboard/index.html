@@ -1,144 +1,69 @@
-<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - SGFS</title>
-    <link rel="stylesheet" th:href="@{/css/layout.css}">
-    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="navbar-container">
-            <div class="navbar-brand">
-                <a th:href="@{/dashboard}">
-                    <span class="logo">📊 SGFS</span>
-                </a>
-            </div>
-            
-            <div class="navbar-menu">
-                <a th:href="@{/dashboard}" class="nav-item active">
-                    🏠 Inicio
-                </a>
-                <a th:href="@{/clientes}" class="nav-item">
-                    👥 Clientes
-                </a>
-                <a th:href="@{/facturas}" class="nav-item">
-                    📄 Facturas
-                </a>
-                <a th:href="@{/pagos}" class="nav-item">
-                    💳 Pagos
-                </a>
-                <a th:href="@{/servicios}" class="nav-item">
-                    🔧 Servicios
-                </a>
-            </div>
-            
-            <div class="navbar-user">
-                <span class="user-info" th:text="${#authentication.name}">Usuario</span>
-                <form th:action="@{/logout}" method="post" style="display: inline;">
-                    <button type="submit" class="btn-logout">🚪 Salir</button>
-                </form>
-            </div>
-        </div>
-    </nav>
+      th:replace="~{layout/base :: layout(title='Dashboard', content=~{::#dashboard-content}, styles=~{::dashboard-styles})}">
 
-    <!-- Contenido principal -->
-    <main class="main-content">
-        <div class="container">
-            <div class="dashboard-header">
-                <h1>Bienvenido al Sistema de Gestión</h1>
-                <p class="subtitle">Panel de control principal</p>
-            </div>
+<div id="dashboard-content">
+    <div class="dashboard-header">
+        <h1>Bienvenido al Sistema de Gestión</h1>
+        <p class="subtitle">Panel de control principal</p>
+    </div>
 
-            <!-- Cards de acceso rápido -->
-            <div class="dashboard-grid">
-                <!-- Card Clientes -->
-                <div class="dashboard-card">
-                    <div class="card-icon clientes">👥</div>
-                    <div class="card-content">
-                        <h3>Clientes</h3>
-                        <p>Gestionar clientes y cuentas</p>
-                        <div class="card-actions">
-                            <a th:href="@{/clientes}" class="btn btn-primary">Ver Todos</a>
-                            <a th:href="@{/clientes/nuevo}" class="btn btn-secondary">Nuevo Cliente</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card Facturas -->
-                <div class="dashboard-card">
-                    <div class="card-icon facturas">📄</div>
-                    <div class="card-content">
-                        <h3>Facturas</h3>
-                        <p>Facturación individual y masiva</p>
-                        <div class="card-actions">
-                            <a th:href="@{/facturas}" class="btn btn-primary">Ver Todas</a>
-                            <a th:href="@{/facturas/nueva}" class="btn btn-secondary">Nueva Factura</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card Pagos -->
-                <div class="dashboard-card">
-                    <div class="card-icon pagos">💳</div>
-                    <div class="card-content">
-                        <h3>Pagos</h3>
-                        <p>Registrar y consultar pagos</p>
-                        <div class="card-actions">
-                            <a th:href="@{/pagos}" class="btn btn-primary">Ver Todos</a>
-                            <a th:href="@{/pagos/nuevo}" class="btn btn-secondary">Registrar Pago</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card Servicios -->
-                <div class="dashboard-card">
-                    <div class="card-icon servicios">🔧</div>
-                    <div class="card-content">
-                        <h3>Servicios y Planes</h3>
-                        <p>Administrar servicios y planes</p>
-                        <div class="card-actions">
-                            <a th:href="@{/planes}" class="btn btn-primary">Planes</a>
-                            <a th:href="@{/servicios}" class="btn btn-secondary">Servicios</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sección de acciones rápidas -->
-            <div class="quick-actions">
-                <h2>Acciones Rápidas</h2>
-                <div class="actions-grid">
-                    <a th:href="@{/facturas/masiva}" class="action-item">
-                        <span class="action-icon">📋</span>
-                        <span class="action-text">Facturación Masiva</span>
-                    </a>
-                    <a th:href="@{/clientes/buscar}" class="action-item">
-                        <span class="action-icon">🔍</span>
-                        <span class="action-text">Buscar Cliente</span>
-                    </a>
-                    <a th:href="@{/facturas/anular}" class="action-item">
-                        <span class="action-icon">❌</span>
-                        <span class="action-text">Anular Factura</span>
-                    </a>
-                    <a th:href="@{/reportes}" class="action-item">
-                        <span class="action-icon">📊</span>
-                        <span class="action-text">Reportes</span>
-                    </a>
+    <!-- Cards de acceso rápido -->
+    <div class="dashboard-grid">
+        <!-- Card Clientes -->
+        <div class="dashboard-card">
+            <div class="card-icon clientes">👥</div>
+            <div class="card-content">
+                <h3>Clientes</h3>
+                <p>Gestionar clientes y cuentas</p>
+                <div class="card-actions">
+                    <a th:href="@{/clientes}" class="btn btn-primary">Ver Todos</a>
+                    <a th:href="@{/clientes/nuevo}" class="btn btn-secondary">Nuevo Cliente</a>
                 </div>
             </div>
         </div>
-    </main>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2025 SGFS - Sistema de Gestión de Facturación de Servicios</p>
+        <!-- Card Facturas -->
+        <div class="dashboard-card">
+            <div class="card-icon facturas">📄</div>
+            <div class="card-content">
+                <h3>Facturas</h3>
+                <p>Facturación individual y masiva</p>
+                <div class="card-actions">
+                    <a th:href="@{/facturas}" class="btn btn-primary">Ver Todas</a>
+                    <a th:href="@{/facturas/nueva}" class="btn btn-secondary">Nueva Factura</a>
+                </div>
+            </div>
         </div>
-    </footer>
-</body>
+
+        <!-- Card Pagos -->
+        <div class="dashboard-card">
+            <div class="card-icon pagos">💳</div>
+            <div class="card-content">
+                <h3>Pagos</h3>
+                <p>Registrar y consultar pagos</p>
+                <div class="card-actions">
+                    <a th:href="@{/pagos}" class="btn btn-primary">Ver Todos</a>
+                    <a th:href="@{/pagos/nuevo}" class="btn btn-secondary">Registrar Pago</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Servicios -->
+        <div class="dashboard-card">
+            <div class="card-icon servicios">🔧</div>
+            <div class="card-content">
+                <h3>Servicios y Planes</h3>
+                <p>Administrar servicios y planes</p>
+                <div class="card-actions">
+                    <a th:href="@{/planes}" class="btn btn-primary">Planes</a>
+                    <a th:href="@{/servicios}" class="btn btn-secondary">Servicios</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block th:fragment="dashboard-styles">
+    <link rel="stylesheet" th:href="@{/css/dashboard-home.css}">
+</th:block>
 </html>

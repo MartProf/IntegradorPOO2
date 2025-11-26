@@ -1,0 +1,72 @@
+/* Estilos específicos para la vista de lista de planes */
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.page-header h1 {
+    color: var(--dark-color);
+    font-size: 1.8rem;
+}
+
+.table-container {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table thead {
+    background: var(--primary-color);
+    color: white;
+}
+
+.data-table th,
+.data-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.data-table td {
+    white-space: nowrap;
+}
+
+.btn-action {
+    display: inline-block;
+    padding: 0.4rem 0.6rem;
+    margin: 0 0.2rem;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.btn-action:hover {
+    opacity: 0.7;
+}
+
+.btn-edit {
+    color: var(--warning-color);
+}
+
+.btn-delete {
+    color: var(--danger-color);
+}
+
+.data-table tbody td {
+    vertical-align: middle;
+}
