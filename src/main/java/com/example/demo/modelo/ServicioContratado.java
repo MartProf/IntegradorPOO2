@@ -45,4 +45,9 @@ public class ServicioContratado {
         // Lógica de precioBase - montoDescuento
         return 0.0; 
     }
+
+    public static Object findById(Long servicioContratadoId) 
+    {
+        throw new UnsupportedOperationException("Unimplemented method 'findById'");
+    }
 }
