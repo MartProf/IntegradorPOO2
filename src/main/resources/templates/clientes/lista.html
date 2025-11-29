@@ -1,0 +1,55 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(title='Clientes', content=~{::#clientes-content}, styles=~{::clientes-styles})}">
+
+<div id="clientes-content">
+    <div class="page-header">
+        <h1>Gestión de Clientes</h1>
+        <a th:href="@{/clientes/nuevo}" class="btn btn-primary">➕ Nuevo Cliente</a>
+    </div>
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Razón Social</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>CUIT/DNI</th>
+                    <th>Condición IVA</th>
+                    <th>Teléfono</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:if="${clientes.isEmpty()}">
+                    <td colspan="8" style="text-align: center; padding: 2rem; color: #666;">
+                        No hay clientes registrados
+                    </td>
+                </tr>
+                <tr th:each="cliente : ${clientes}">
+                    <td th:text="${cliente.id}">1</td>
+                    <td th:text="${cliente.razonSocial}">Empresa S.A.</td>
+                    <td th:text="${cliente.nombre}">Juan</td>
+                    <td th:text="${cliente.apellido}">Pérez</td>
+                    <td th:text="${cliente.cuitDni}">20-12345678-9</td>
+                    <td th:text="${cliente.condicionIVA}">RESPONSABLE_INSCRIPTO</td>
+                    <td th:text="${cliente.telefono}">11-2345-6789</td>
+                    <td>
+                        <a th:href="@{/clientes/editar/{id}(id=${cliente.id})}"
+                           class="btn-action btn-edit"
+                           title="Editar">✏️</a>
+                        <a th:href="@{/clientes/eliminar/{id}(id=${cliente.id})}"
+                           class="btn-action btn-delete"
+                           title="Eliminar"
+                           onclick="return confirm('¿Está seguro de eliminar este cliente?')">🗑️</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<th:block th:fragment="clientes-styles">
+    <link rel="stylesheet" th:href="@{/css/clientes-lista.css}">
+</th:block>
+</html>

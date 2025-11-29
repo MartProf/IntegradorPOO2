@@ -21,20 +21,23 @@ public class Cliente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
-    
+
     @ToString.Include
     private String razonSocial;
-    
+
+    private String nombre;
+    private String apellido;
+
     @Column(unique = true, nullable = false)
     private String cuitDni;
-    
+
     private String domicilio;
-    private String contacto;
-    
+    private String telefono;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CondicionFiscal condicionIVA;
-    
+
     // Relación 1-1 con CuentaCliente (Cliente es dueño)
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "cliente")
     private CuentaCliente cuentaCliente;
