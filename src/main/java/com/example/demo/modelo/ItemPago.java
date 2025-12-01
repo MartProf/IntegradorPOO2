@@ -1,10 +1,6 @@
 package com.example.demo.modelo;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -19,19 +15,29 @@ import lombok.ToString;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-public class ItemPago  
-{
+public class ItemPago {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
 
+    @Column(nullable = false)
     private Double monto;
+    
     private String referencia;
     
     // Relación N-1 con Pago
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pago_id", nullable = false)
     private Pago pago; 
-    // Relación N-1 con MedioPago (enum)
-    private MedioPago medioPago;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private MedioPago medio;
+    
+    // MÉTODO DE NEGOCIO - Validación de monto
+    public boolean validarMonto() {
+        return this.monto != null && this.monto > 0;
+    }
 }

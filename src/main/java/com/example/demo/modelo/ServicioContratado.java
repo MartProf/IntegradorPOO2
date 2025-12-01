@@ -1,17 +1,14 @@
 package com.example.demo.modelo;
 
-import java.time.LocalDate;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -21,6 +18,7 @@ import lombok.ToString;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
 public class ServicioContratado {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
@@ -30,24 +28,21 @@ public class ServicioContratado {
     private Double montoDescuento;
     private LocalDate fechaInicio;
     
-    // Relación N-1 con CuentaCliente
-    @ManyToOne
-    private CuentaCliente cuentaCliente; 
-    // Relación N-1 con Servicio
-    @ManyToOne
-    private Servicio servicio;
-    // Relación N-1 con Plan
-    @ManyToOne
-    private Plan plan;
+    // ⭐⭐ AGREGAR ESTE CAMPO ⭐⭐
+    private Boolean activo = true;
     
-    // MÉTODO DE NEGOCIO
-    public Double calcularPrecioFinal() { 
-        // Lógica de precioBase - montoDescuento
-        return 0.0; 
-    }
-
-    public static Object findById(Long servicioContratadoId) 
-    {
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
-    }
+    // Relación N-1 con CuentaCliente
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cuenta_cliente_id", nullable = false)
+    private CuentaCliente cuentaCliente;
+    
+    // Relación N-1 con Servicio
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "servicio_id", nullable = false)
+    private Servicio servicio;
+    
+    // Relación N-1 con Plan
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "plan_id")
+    private Plan plan;
 }

@@ -1,17 +1,14 @@
 package com.example.demo.modelo;
 
-import java.time.LocalDate;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -20,28 +17,53 @@ import lombok.ToString;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-public class NotaCredito 
-{
+public class NotaCredito {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
+    
+    @Column(unique = true)
     private String numero;
+    
     private LocalDate fechaEmision;
     private Double montoTotalCredito;
-    private String motivo; // Registro Obligatorio del motivo
+    
+    @Column(nullable = false)
+    private String motivo; // Registro Obligatorio del motivo (HU 1.7)
 
-    // Relación N-1 (CLAVE PARA TRAZABILIDAD)
-    @ManyToOne
+    // Relación N-1 con Factura (CLAVE PARA TRAZABILIDAD)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "factura_anulada_id", nullable = false)
     private Factura facturaAnulada; 
     
     // Relación N-1 con CuentaCliente
-    @ManyToOne
-    private CuentaCliente cuentaCliente; 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cuenta_cliente_id", nullable = false)
+    private CuentaCliente cuentaCliente;
 
     // MÉTODO DE NEGOCIO (HU 1.7)
-    public void generar(Factura factura, String motivo) { 
-        // Lógica: Actualiza estado de Factura, llama a CuentaCliente.revertirDeuda()
+    public void generarDesdeFactura(Factura factura, String motivo) { 
+        this.facturaAnulada = factura;
+        this.cuentaCliente = factura.getCuentaCliente();
+        this.montoTotalCredito = factura.getMontoTotalFinal();
+        this.motivo = motivo;
+        this.fechaEmision = LocalDate.now();
+        
+        // Anular la factura
+        factura.anular(motivo);
+        
+        // Revertir deuda en cuenta cliente
+        if (this.cuentaCliente != null && this.montoTotalCredito != null) {
+            this.cuentaCliente.revertirDeuda(this.montoTotalCredito);
+        }
     }
-
+    
+    // Validación de negocio
+    public boolean esValida() {
+        return this.motivo != null && !this.motivo.trim().isEmpty() &&
+               this.montoTotalCredito != null && this.montoTotalCredito > 0 &&
+               this.facturaAnulada != null;
+    }
 }

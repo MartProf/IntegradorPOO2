@@ -2,5 +2,6 @@ package com.example.demo.modelo;
 
 public enum EstadoCuenta {
     ACTIVA,
-    INACTIVA,
+    INACTIVA
+    // Eliminada coma sobrante
 }

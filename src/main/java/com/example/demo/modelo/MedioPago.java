@@ -1,9 +1,10 @@
 package com.example.demo.modelo;
 
-public enum MedioPago 
-{
+public enum MedioPago {
     TRANSFERENCIA,
-    TARJETA,
+    TARJETA_CREDITO,
+    TARJETA_DEBITO,
     EFECTIVO,
-    DEBITO
+    CHEQUE
+    // Eliminada coma sobrante y mejorada nomenclatura
 }
