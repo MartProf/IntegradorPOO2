@@ -6,7 +6,7 @@
 * **Federico:** Desarrollo de los ABM de Clientes y Servicios.
 
 # Diseño OO
-![Diagrama de clases](Diagrama%20de%20clases.jpg)
+![Diagrama de clases](img/Diagrama%20de%20clases.jpg)
 
 # Wireframe y caso de uso
 
@@ -17,7 +17,7 @@
 4.  El usuario ingresa los datos y confirma.
 5.  El sistema valida los datos, crea automáticamente la cuenta del cliente y guarda.
 
-![Alta de Cliente](AltaDeCliente.png)
+![Alta de Cliente](img/AltaDeCliente.png)
 
 ## Caso de Uso: Alta de Plan
 1.  El usuario navega a la sección "Planes".
@@ -26,7 +26,7 @@
 4.  El usuario ingresa los datos y confirma.
 5.  El sistema valida y guarda el plan.
 
-![Alta de Plan](AltaDePlan.png)
+![Alta de Plan](img/AltaDePlan.png)
 
 ## Caso de Uso: Alta de Servicio
 1.  El usuario navega a la sección "Servicios".
@@ -35,7 +35,7 @@
 4.  El usuario ingresa los datos y confirma.
 5.  El sistema valida y guarda el servicio.
 
-![Alta de Servicio](AltaServicio.png)
+![Alta de Servicio](img/AltaServicio.png)
 
 # Backlog de iteración
 * **HU 1.1:** ABM de Clientes.
