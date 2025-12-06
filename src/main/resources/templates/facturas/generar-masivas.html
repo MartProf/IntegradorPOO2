@@ -1,0 +1,76 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(title='Facturación Masiva', content=~{::#masivas-content}, styles=~{::masivas-styles})}">
+
+<div id="masivas-content">
+    <div class="page-header">
+        <h1 th:text="${titulo}">Facturación Masiva</h1>
+        <a th:href="@{/facturas}" class="btn btn-secondary">← Volver</a>
+    </div>
+
+    <div class="confirmacion-container">
+        <div class="warning-box">
+            <h3>⚠️ Atención</h3>
+            <p>Está por generar facturas para <strong>todos los clientes</strong> que tienen servicios o planes activos.</p>
+        </div>
+
+        <div class="info-box">
+            <h4>ℹ️ Este proceso:</h4>
+            <ul>
+                <li>Generará una factura individual para cada cliente con servicios activos</li>
+                <li>Calculará automáticamente el tipo de factura (A, B o C) según la condición fiscal</li>
+                <li>Actualizará la deuda de cada cuenta</li>
+                <li>Generará números de factura secuenciales</li>
+                <li>Puede tomar varios segundos si hay muchos clientes</li>
+            </ul>
+            <p><strong>Esta operación no se puede deshacer.</strong></p>
+        </div>
+
+        <form th:action="@{/facturas/generar-masivas}" method="post">
+            <div class="form-actions">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('¿Confirma generar facturas masivas para todos los clientes?')">
+                    📄 Generar Facturas Masivas
+                </button>
+                <a th:href="@{/facturas}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<th:block th:fragment="masivas-styles">
+    <link rel="stylesheet" th:href="@{/css/facturas-generar.css}">
+    <style>
+        .confirmacion-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+        }
+        
+        .warning-box h3 {
+            margin-top: 0;
+            color: #856404;
+        }
+        
+        .warning-box p {
+            margin-bottom: 0;
+            color: #856404;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+    </style>
+</th:block>
+
+</html>

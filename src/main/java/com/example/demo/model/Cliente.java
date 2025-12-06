@@ -1,5 +1,7 @@
 package com.example.demo.model;
 
+import com.example.demo.model.enums.CondicionFiscal;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

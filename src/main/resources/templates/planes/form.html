@@ -30,6 +30,17 @@
             </div>
 
             <div class="form-group">
+                <label for="descripcion">Descripción</label>
+                <textarea 
+                    id="descripcion" 
+                    th:field="*{descripcion}" 
+                    placeholder="Ej: Ideal para uso básico del hogar"
+                    rows="3"
+                    maxlength="500"></textarea>
+                <small class="form-help-text">Descripción detallada del plan (opcional)</small>
+            </div>
+
+            <div class="form-group">
                 <label for="precioBase">
                     Precio Base
                     <span class="required-mark">*</span>
@@ -45,6 +56,50 @@
                 <small class="form-help-text">Precio mensual del plan</small>
             </div>
 
+            <div class="form-group">
+                <label>Servicios Incluidos</label>
+                <div class="servicios-selection">
+                    <div th:if="${servicios != null and !servicios.isEmpty()}" class="servicios-list">
+                        <div th:each="servicio : ${servicios}" class="servicio-item">
+                            <label>
+                                <input 
+                                    type="checkbox" 
+                                    name="serviciosIds" 
+                                    th:value="${servicio.id}"
+                                    th:checked="${plan.id != null and plan.incluyeServicio(servicio.id)}" />
+                                <span class="servicio-nombre" th:text="${servicio.nombre}">Servicio</span>
+                                <span class="servicio-precio" th:text="'$' + ${#numbers.formatDecimal(servicio.precioBase, 1, 2)}">$0.00</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div th:if="${servicios == null or servicios.isEmpty()}" class="no-servicios">
+                        No hay servicios disponibles.
+                        <a th:href="@{/servicios/nuevo}" class="link-crear">Crear servicio</a>
+                    </div>
+                </div>
+                <small class="form-help-text">Selecciona los servicios que incluye este plan</small>
+            </div>
+
+            <!-- Panel de resumen con cálculos automáticos -->
+            <div class="resumen-plan">
+                <h3>📊 Resumen del Plan</h3>
+                <div class="resumen-item">
+                    <span class="resumen-label">Precio Individual (servicios sueltos):</span>
+                    <span class="resumen-valor" id="precioIndividual">$0.00</span>
+                </div>
+                <div class="resumen-item">
+                    <span class="resumen-label">Precio del Plan:</span>
+                    <span class="resumen-valor precio-plan" id="precioPlan">$0.00</span>
+                </div>
+                <div class="resumen-item destacado">
+                    <span class="resumen-label">💰 Ahorro:</span>
+                    <span class="resumen-valor ahorro" id="ahorro">$0.00</span>
+                </div>
+                <small class="resumen-nota" id="mensajeAhorro" style="display: none;">
+                    ⚠️ El precio del plan debería ser menor que la suma de servicios individuales
+                </small>
+            </div>
+
             <div class="form-actions">
                 <a th:href="@{/planes}" class="btn btn-secondary">❌ Cancelar</a>
                 <button type="submit" class="btn btn-primary">💾 Guardar</button>
@@ -55,5 +110,76 @@
 
 <th:block th:fragment="plan-form-styles">
     <link rel="stylesheet" th:href="@{/css/planes-form.css}">
+    <script th:inline="javascript">
+        // Datos de servicios para cálculos en JavaScript
+        const serviciosData = [[${servicios}]];
+        const serviciosMap = new Map();
+        
+        serviciosData.forEach(servicio => {
+            serviciosMap.set(servicio.id, servicio.precioBase);
+        });
+
+    function formatearPrecio(valor) {
+        return '$' + valor.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    function calcularResumen() {
+        // Obtener checkboxes seleccionados
+        const checkboxes = document.querySelectorAll('input[name="serviciosIds"]:checked');
+        let precioIndividual = 0;
+        
+        checkboxes.forEach(checkbox => {
+            const servicioId = parseInt(checkbox.value);
+            const precio = serviciosMap.get(servicioId) || 0;
+            precioIndividual += precio;
+        });
+        
+        // Obtener precio del plan
+        const precioPlanInput = document.getElementById('precioBase');
+        const precioPlan = parseFloat(precioPlanInput.value) || 0;
+        
+        // Calcular ahorro
+        const ahorro = precioIndividual - precioPlan;
+        
+        // Actualizar UI
+        document.getElementById('precioIndividual').textContent = formatearPrecio(precioIndividual);
+        document.getElementById('precioPlan').textContent = formatearPrecio(precioPlan);
+        
+        const ahorroElement = document.getElementById('ahorro');
+            const mensajeElement = document.getElementById('mensajeAhorro');
+            
+            if (ahorro > 0) {
+                ahorroElement.textContent = formatearPrecio(ahorro);
+                ahorroElement.style.color = '#28a745';
+                mensajeElement.style.display = 'none';
+            } else if (ahorro < 0) {
+                ahorroElement.textContent = formatearPrecio(Math.abs(ahorro));
+                ahorroElement.style.color = '#dc3545';
+                mensajeElement.style.display = 'block';
+            } else {
+                ahorroElement.textContent = '$0.00';
+                ahorroElement.style.color = '#6c757d';
+                mensajeElement.style.display = 'none';
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Calcular al cargar la página
+            calcularResumen();
+            
+            // Recalcular cuando cambien los checkboxes
+            const checkboxes = document.querySelectorAll('input[name="serviciosIds"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', calcularResumen);
+            });
+            
+            // Recalcular cuando cambie el precio del plan
+            const precioPlanInput = document.getElementById('precioBase');
+            if (precioPlanInput) {
+                precioPlanInput.addEventListener('input', calcularResumen);
+            }
+        });
+    </script>
 </th:block>
 </html>

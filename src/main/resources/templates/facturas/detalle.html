@@ -1,0 +1,126 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(title='Detalle Factura', content=~{::#detalle-content}, styles=~{::detalle-styles})}">
+
+<div id="detalle-content">
+    <div class="page-header">
+        <h1 th:text="${titulo}">Detalle de Factura</h1>
+        <a th:href="@{/facturas}" class="btn btn-secondary">← Volver</a>
+    </div>
+
+    <div class="factura-container">
+        <!-- Encabezado de la factura -->
+        <div class="factura-header">
+            <div class="factura-info">
+                <h2>
+                    <span class="badge-tipo-factura" 
+                          th:classappend="${'badge-' + factura.tipoFactura.name().toLowerCase()}"
+                          th:text="${factura.tipoFactura.descripcion}">
+                        Factura A
+                    </span>
+                    <span th:text="${factura.numero}">2025-12-00000001</span>
+                </h2>
+                <p class="estado-factura">
+                    <strong>Estado:</strong>
+                    <span class="badge-estado" 
+                          th:classappend="${'badge-' + factura.estado.name().toLowerCase()}"
+                          th:text="${factura.estado}">
+                        PENDIENTE
+                    </span>
+                    <span th:if="${factura.estaVencida()}" class="texto-vencida">⚠️ VENCIDA</span>
+                </p>
+            </div>
+            
+            <div class="factura-fechas">
+                <p><strong>Fecha Emisión:</strong> <span th:text="${#temporals.format(factura.fechaEmision, 'dd/MM/yyyy')}">06/12/2025</span></p>
+                <p><strong>Vencimiento:</strong> <span th:text="${#temporals.format(factura.fechaVencimiento, 'dd/MM/yyyy')}">16/12/2025</span></p>
+            </div>
+        </div>
+
+        <!-- Datos del cliente -->
+        <div class="cliente-section">
+            <h3>Cliente</h3>
+            <div class="cliente-datos">
+                <p><strong>Razón Social:</strong> <span th:text="${factura.cuentaCliente.cliente.razonSocial}">Cliente S.A.</span></p>
+                <p><strong>CUIT/DNI:</strong> <span th:text="${factura.cuentaCliente.cliente.cuitDni}">20-12345678-9</span></p>
+                <p><strong>Condición IVA:</strong> <span th:text="${factura.cuentaCliente.cliente.condicionIVA}">RESPONSABLE_INSCRIPTO</span></p>
+                <p><strong>Domicilio:</strong> <span th:text="${factura.cuentaCliente.cliente.domicilio}">Av. Ejemplo 123</span></p>
+                <p><strong>Teléfono:</strong> <span th:text="${factura.cuentaCliente.cliente.telefono}">11-1234-5678</span></p>
+            </div>
+        </div>
+
+        <!-- Detalle de items -->
+        <div class="items-section">
+            <h3>Detalle de Servicios</h3>
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th>Descripción</th>
+                        <th>Cantidad</th>
+                        <th>Subtotal</th>
+                        <th th:if="${factura.discriminaIVA()}">IVA (21%)</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="detalle : ${factura.detalles}">
+                        <td th:text="${detalle.descripcionServicio}">Servicio de Internet</td>
+                        <td th:text="${detalle.cantidad}">1</td>
+                        <td th:text="${'$' + #numbers.formatDecimal(detalle.subtotalNeto, 1, 'POINT', 2, 'COMMA')}">$8.264,46</td>
+                        <td th:if="${factura.discriminaIVA()}" 
+                            th:text="${'$' + #numbers.formatDecimal(detalle.montoIVA, 1, 'POINT', 2, 'COMMA')}">$1.735,54</td>
+                        <td th:text="${'$' + #numbers.formatDecimal(detalle.subtotalNeto + detalle.montoIVA, 1, 'POINT', 2, 'COMMA')}">$10.000,00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Totales -->
+        <div class="totales-section">
+            <div class="totales-content">
+                <div th:if="${factura.discriminaIVA()}" class="total-row">
+                    <span>Subtotal:</span>
+                    <span th:text="${'$' + #numbers.formatDecimal(factura.calcularSubtotal(), 1, 'POINT', 2, 'COMMA')}">$8.264,46</span>
+                </div>
+                <div th:if="${factura.discriminaIVA()}" class="total-row">
+                    <span>IVA (21%):</span>
+                    <span th:text="${'$' + #numbers.formatDecimal(factura.calcularIVATotal(), 1, 'POINT', 2, 'COMMA')}">$1.735,54</span>
+                </div>
+                <div class="total-row total-final">
+                    <span>TOTAL:</span>
+                    <span th:text="${'$' + #numbers.formatDecimal(factura.montoTotalFinal, 1, 'POINT', 2, 'COMMA')}">$10.000,00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="acciones-section">
+            <form th:if="${factura.estado.name() == 'PENDIENTE'}" 
+                  th:action="@{/facturas/{id}/pagar(id=${factura.id})}" 
+                  method="post" 
+                  style="display: inline;">
+                <button type="submit" class="btn btn-success" onclick="return confirm('¿Marcar como pagada?')">
+                    ✓ Marcar como Pagada
+                </button>
+            </form>
+            
+            <form th:if="${factura.estado.name() == 'PENDIENTE'}" 
+                  th:action="@{/facturas/{id}/anular(id=${factura.id})}" 
+                  method="post" 
+                  style="display: inline;">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('¿Anular esta factura?')">
+                    ✗ Anular Factura
+                </button>
+            </form>
+            
+            <a th:href="@{/facturas/cuenta/{id}(id=${factura.cuentaCliente.id})}" class="btn btn-primary">
+                📋 Ver todas las facturas de este cliente
+            </a>
+        </div>
+    </div>
+</div>
+
+<th:block th:fragment="detalle-styles">
+    <link rel="stylesheet" th:href="@{/css/facturas-detalle.css}">
+</th:block>
+
+</html>

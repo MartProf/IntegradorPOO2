@@ -1,0 +1,50 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(title='Generar Factura', content=~{::#generar-content}, styles=~{::generar-styles})}">
+
+<div id="generar-content">
+    <div class="page-header">
+        <h1 th:text="${titulo}">Generar Factura</h1>
+        <a th:href="@{/facturas}" class="btn btn-secondary">← Cancelar</a>
+    </div>
+
+    <div class="form-container">
+        <form th:action="@{/facturas/generar}" method="post">
+            <div class="form-group">
+                <label for="cuentaClienteId">Seleccionar Cliente *</label>
+                <select id="cuentaClienteId" name="cuentaClienteId" class="form-control" required>
+                    <option value="">-- Seleccione un cliente --</option>
+                    <option th:each="cuenta : ${cuentas}" 
+                            th:value="${cuenta.id}"
+                            th:text="${cuenta.cliente.razonSocial + ' - CUIT: ' + cuenta.cliente.cuitDni + ' (' + cuenta.cliente.condicionIVA + ')'}">
+                        Cliente S.A. - CUIT: 20-12345678-9 (RESPONSABLE_INSCRIPTO)
+                    </option>
+                </select>
+                <small class="form-text">
+                    Se generará una factura por todos los servicios activos de este cliente.
+                    El tipo de factura (A, B o C) se determinará automáticamente según su condición fiscal.
+                </small>
+            </div>
+
+            <div class="info-box">
+                <h4>ℹ️ Información sobre Tipos de Factura</h4>
+                <ul>
+                    <li><strong>Factura A:</strong> Se emite a Responsables Inscriptos. Discrimina IVA.</li>
+                    <li><strong>Factura B:</strong> Se emite a Monotributistas o Consumidores Finales. IVA incluido.</li>
+                    <li><strong>Factura C:</strong> Se emite cuando el emisor es Monotributista. Sin IVA.</li>
+                </ul>
+                <p><strong>Vencimiento:</strong> 10 días desde la fecha de emisión</p>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">📄 Generar Factura</button>
+                <a th:href="@{/facturas}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<th:block th:fragment="generar-styles">
+    <link rel="stylesheet" th:href="@{/css/facturas-generar.css}">
+</th:block>
+
+</html>

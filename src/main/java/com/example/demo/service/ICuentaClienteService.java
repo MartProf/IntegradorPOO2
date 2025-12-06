@@ -1,7 +1,8 @@
 package com.example.demo.service;
 
 import com.example.demo.model.CuentaCliente;
-import com.example.demo.model.EstadoCuenta;
+import com.example.demo.model.enums.EstadoCuenta;
+
 import java.util.List;
 import java.util.Optional;
 

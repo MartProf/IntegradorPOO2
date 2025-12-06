@@ -1,7 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Cliente;
-import com.example.demo.model.CondicionFiscal;
+import com.example.demo.model.enums.CondicionFiscal;
 import com.example.demo.service.ClienteServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

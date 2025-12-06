@@ -70,3 +70,61 @@
 .data-table tbody td {
     vertical-align: middle;
 }
+
+/* Estilos para servicios incluidos en la tabla */
+.servicios-incluidos {
+    max-width: 300px;
+}
+
+.servicios-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.servicio-badge {
+    display: inline-block;
+    background: var(--primary-color);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    cursor: help;
+}
+
+.no-servicios-badge {
+    color: var(--text-secondary);
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+.ahorro-badge {
+    display: inline-block;
+    color: white;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.ahorro-badge.ahorro-positivo {
+    background: var(--success-color);
+}
+
+.ahorro-badge.ahorro-negativo {
+    background: var(--danger-color);
+}
+
+.sin-ahorro {
+    color: var(--text-secondary);
+}
+
+.precio-individual {
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-decoration: line-through;
+}
+
+.text-muted {
+    color: var(--text-secondary);
+}

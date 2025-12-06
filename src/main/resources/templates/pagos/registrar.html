@@ -1,0 +1,485 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(title='Registrar Pago', content=~{::#registrar-pago-content}, styles=~{::registrar-pago-styles}, scripts=~{::registrar-pago-scripts})}">
+
+<div id="registrar-pago-content">
+    <div class="page-header">
+        <h1 th:text="${titulo}">Registrar Pago</h1>
+        <a th:href="@{/pagos}" class="btn btn-secondary">← Volver</a>
+    </div>
+
+    <form th:action="@{/pagos/registrar}" method="post" id="formPago" class="form-pago">
+        
+        <!-- Selección de Cliente -->
+        <div class="form-section">
+            <h3>Datos del Pago</h3>
+            
+            <div class="form-group">
+                <label for="cuentaClienteId">Cliente *</label>
+                <select id="cuentaClienteId" name="cuentaClienteId" class="form-control" required>
+                    <option value="">Seleccione un cliente</option>
+                    <option th:each="cuenta : ${cuentas}" 
+                            th:value="${cuenta.id}"
+                            th:text="${cuenta.cliente.razonSocial + ' - ' + cuenta.cliente.cuitDni}">
+                        Cliente S.A. - 20-12345678-9
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="medioPago">Medio de Pago *</label>
+                <select id="medioPago" name="medioPago" class="form-control" required>
+                    <option value="">Seleccione un medio de pago</option>
+                    <option th:each="medio : ${mediosPago}" 
+                            th:value="${medio}"
+                            th:text="${medio.descripcion}">
+                        Efectivo
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="referencia">Referencia (opcional)</label>
+                <input type="text" id="referencia" name="referencia" class="form-control" 
+                       placeholder="Ej: Cheque 12345, Transferencia TRF-67890">
+                <small class="form-text">Número de cheque, transferencia, comprobante, etc.</small>
+            </div>
+        </div>
+
+        <!-- Facturas Pendientes -->
+        <div class="form-section" id="facturasSection" style="display: none;">
+            <h3>Facturas Pendientes</h3>
+            <div id="facturasContainer" class="facturas-container">
+                <p class="loading-text">Seleccione un cliente para ver sus facturas pendientes...</p>
+            </div>
+        </div>
+
+        <!-- Resumen del Pago -->
+        <div class="form-section" id="resumenSection" style="display: none;">
+            <h3>Resumen del Pago</h3>
+            <div class="resumen-box">
+                <div class="resumen-item">
+                    <span>Cantidad de facturas:</span>
+                    <span id="cantidadFacturas">0</span>
+                </div>
+                <div class="resumen-item total">
+                    <span>TOTAL A PAGAR:</span>
+                    <span id="totalPagar">$0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="btnRegistrar" disabled>
+                💰 Registrar Pago
+            </button>
+            <a th:href="@{/pagos}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<th:block th:fragment="registrar-pago-styles">
+    <style>
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .form-pago {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .form-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-section h3 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-text {
+            display: block;
+            margin-top: 0.5rem;
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        .facturas-container {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .loading-text {
+            text-align: center;
+            color: #999;
+            padding: 2rem;
+        }
+
+        .factura-item {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .factura-item:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .factura-item.selected {
+            background: #e8eaf6;
+            border-color: #667eea;
+        }
+
+        .factura-check {
+            flex-shrink: 0;
+        }
+
+        .factura-check input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .factura-info {
+            flex: 1;
+        }
+
+        .factura-numero {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .factura-detalles {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .factura-badge {
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-pendiente {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-pago_parcial {
+            background: #cfe2ff;
+            color: #084298;
+        }
+
+        .factura-monto-input {
+            flex-shrink: 0;
+            width: 180px;
+        }
+
+        .factura-monto-input input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .factura-monto-input input:focus {
+            outline: none;
+            border-color: #11998e;
+        }
+
+        .factura-monto-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 0.3rem;
+        }
+
+        .factura-total {
+            font-size: 0.85rem;
+            color: #999;
+            margin-top: 0.3rem;
+        }
+
+        .resumen-box {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .resumen-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            font-size: 1.1rem;
+        }
+
+        .resumen-item.total {
+            border-top: 2px solid #dee2e6;
+            margin-top: 0.5rem;
+            padding-top: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #11998e;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+    </style>
+</th:block>
+
+<th:block th:fragment="registrar-pago-scripts">
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectCuenta = document.getElementById('cuentaClienteId');
+            const facturasSection = document.getElementById('facturasSection');
+            const facturasContainer = document.getElementById('facturasContainer');
+            const resumenSection = document.getElementById('resumenSection');
+            const btnRegistrar = document.getElementById('btnRegistrar');
+            
+            let facturasSeleccionadas = [];
+            
+            // Cuando se selecciona un cliente, cargar sus facturas pendientes
+            selectCuenta.addEventListener('change', function() {
+                const cuentaId = this.value;
+                
+                if (!cuentaId) {
+                    facturasSection.style.display = 'none';
+                    resumenSection.style.display = 'none';
+                    btnRegistrar.disabled = true;
+                    return;
+                }
+                
+                facturasContainer.innerHTML = '<p class="loading-text">Cargando facturas...</p>';
+                facturasSection.style.display = 'block';
+                
+                // Cargar facturas pendientes mediante AJAX
+                fetch(`/pagos/facturas-pendientes/${cuentaId}`)
+                    .then(response => response.json())
+                    .then(facturas => {
+                        if (facturas.length === 0) {
+                            facturasContainer.innerHTML = '<p class="loading-text">No hay facturas pendientes para este cliente</p>';
+                            resumenSection.style.display = 'none';
+                            btnRegistrar.disabled = true;
+                            return;
+                        }
+                        
+                        mostrarFacturas(facturas);
+                    })
+                    .catch(error => {
+                        console.error('Error al cargar facturas:', error);
+                        facturasContainer.innerHTML = '<p class="loading-text" style="color: red;">Error al cargar las facturas</p>';
+                    });
+            });
+            
+            function mostrarFacturas(facturas) {
+                facturasContainer.innerHTML = '';
+                facturasSeleccionadas = [];
+                
+                facturas.forEach(factura => {
+                    const facturaDiv = document.createElement('div');
+                    facturaDiv.className = 'factura-item';
+                    facturaDiv.dataset.facturaId = factura.id;
+                    
+                    const estadoBadge = factura.estado === 'PENDIENTE' ? 'badge-pendiente' : 'badge-pago_parcial';
+                    const estadoTexto = factura.estado === 'PENDIENTE' ? 'Pendiente' : 'Pago Parcial';
+                    
+                    facturaDiv.innerHTML = `
+                        <div class="factura-check">
+                            <input type="checkbox" class="factura-checkbox" data-factura-id="${factura.id}">
+                            <input type="hidden" name="facturaIds" value="${factura.id}" disabled>
+                        </div>
+                        <div class="factura-info">
+                            <div class="factura-numero">${factura.numero}</div>
+                            <div class="factura-detalles">
+                                <span>Fecha: ${formatearFecha(factura.fechaEmision)}</span>
+                                <span class="factura-badge ${estadoBadge}">${estadoTexto}</span>
+                            </div>
+                        </div>
+                        <div class="factura-monto-input">
+                            <div class="factura-monto-label">Monto a pagar</div>
+                            <input type="number" 
+                                   name="montos" 
+                                   step="0.01" 
+                                   min="0.01" 
+                                   max="${factura.montoTotal}"
+                                   value="${factura.montoTotal}"
+                                   class="monto-input"
+                                   data-factura-id="${factura.id}"
+                                   disabled>
+                            <div class="factura-total">Total: $${formatearMonto(factura.montoTotal)}</div>
+                        </div>
+                    `;
+                    
+                    facturasContainer.appendChild(facturaDiv);
+                });
+                
+                // Agregar eventos a los checkboxes
+                document.querySelectorAll('.factura-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', actualizarSeleccion);
+                });
+                
+                // Agregar eventos a los inputs de monto
+                document.querySelectorAll('.monto-input').forEach(input => {
+                    input.addEventListener('input', actualizarResumen);
+                });
+            }
+            
+            function actualizarSeleccion(event) {
+                const checkbox = event.target;
+                const facturaId = checkbox.dataset.facturaId;
+                const facturaItem = checkbox.closest('.factura-item');
+                const montoInput = facturaItem.querySelector('.monto-input');
+                const hiddenInput = facturaItem.querySelector('input[type="hidden"]');
+                
+                if (checkbox.checked) {
+                    facturaItem.classList.add('selected');
+                    montoInput.disabled = false;
+                    hiddenInput.disabled = false;
+                } else {
+                    facturaItem.classList.remove('selected');
+                    montoInput.disabled = true;
+                    hiddenInput.disabled = true;
+                }
+                
+                actualizarResumen();
+            }
+            
+            function actualizarResumen() {
+                let total = 0;
+                let cantidad = 0;
+                
+                document.querySelectorAll('.factura-checkbox:checked').forEach(checkbox => {
+                    const facturaId = checkbox.dataset.facturaId;
+                    const facturaItem = checkbox.closest('.factura-item');
+                    const montoInput = facturaItem.querySelector('.monto-input');
+                    const monto = parseFloat(montoInput.value) || 0;
+                    
+                    total += monto;
+                    cantidad++;
+                });
+                
+                document.getElementById('cantidadFacturas').textContent = cantidad;
+                document.getElementById('totalPagar').textContent = '$' + formatearMonto(total);
+                
+                if (cantidad > 0 && total > 0) {
+                    resumenSection.style.display = 'block';
+                    btnRegistrar.disabled = false;
+                } else {
+                    resumenSection.style.display = 'none';
+                    btnRegistrar.disabled = true;
+                }
+            }
+            
+            function formatearFecha(fecha) {
+                const partes = fecha.split('-');
+                return `${partes[2]}/${partes[1]}/${partes[0]}`;
+            }
+            
+            function formatearMonto(monto) {
+                return new Intl.NumberFormat('es-AR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(monto);
+            }
+        });
+    </script>
+</th:block>
+
+</html>

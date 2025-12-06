@@ -1,7 +1,9 @@
 package com.example.demo.service;
 
 import com.example.demo.model.Plan;
+import com.example.demo.model.Servicio;
 import com.example.demo.repository.PlanRepository;
+import com.example.demo.repository.ServicioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +17,9 @@ public class PlanServiceImpl implements IPlanService {
     
     @Autowired
     private PlanRepository planRepository;
+    
+    @Autowired
+    private ServicioRepository servicioRepository;
     
     @Override
     @Transactional(readOnly = true)
@@ -69,5 +74,54 @@ public class PlanServiceImpl implements IPlanService {
             throw new IllegalArgumentException("El plan no existe");
         }
         planRepository.deleteById(id);
+    }
+    
+    @Override
+    public Plan agregarServicio(Long planId, Long servicioId) {
+        Plan plan = planRepository.findById(planId)
+                .orElseThrow(() -> new IllegalArgumentException("Plan no encontrado con ID: " + planId));
+        
+        Servicio servicio = servicioRepository.findById(servicioId)
+                .orElseThrow(() -> new IllegalArgumentException("Servicio no encontrado con ID: " + servicioId));
+        
+        // Verificar que no esté ya incluido
+        if (plan.incluyeServicio(servicioId)) {
+            throw new IllegalArgumentException("El servicio ya está incluido en este plan");
+        }
+        
+        plan.agregarServicio(servicio);
+        return planRepository.save(plan);
+    }
+    
+    @Override
+    public Plan removerServicio(Long planId, Long servicioId) {
+        Plan plan = planRepository.findById(planId)
+                .orElseThrow(() -> new IllegalArgumentException("Plan no encontrado con ID: " + planId));
+        
+        Servicio servicio = servicioRepository.findById(servicioId)
+                .orElseThrow(() -> new IllegalArgumentException("Servicio no encontrado con ID: " + servicioId));
+        
+        plan.removerServicio(servicio);
+        return planRepository.save(plan);
+    }
+    
+    @Override
+    public Plan actualizarServiciosIncluidos(Long planId, List<Long> serviciosIds) {
+        Plan plan = planRepository.findById(planId)
+                .orElseThrow(() -> new IllegalArgumentException("Plan no encontrado con ID: " + planId));
+        
+        // Limpiar servicios actuales
+        plan.getServiciosIncluidos().clear();
+        
+        // Agregar nuevos servicios
+        if (serviciosIds != null && !serviciosIds.isEmpty()) {
+            for (Long servicioId : serviciosIds) {
+                Servicio servicio = servicioRepository.findById(servicioId)
+                        .orElseThrow(() -> new IllegalArgumentException("Servicio no encontrado con ID: " + servicioId));
+                plan.agregarServicio(servicio);
+            }
+        }
+        
+        return planRepository.save(plan);
     }
 }

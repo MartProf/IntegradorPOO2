@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "servicios")
@@ -18,6 +19,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
+@JsonIgnoreProperties({"contratos", "hibernateLazyInitializer", "handler"})
 public class Servicio {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

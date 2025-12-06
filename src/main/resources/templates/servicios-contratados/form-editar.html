@@ -1,0 +1,70 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(title='Editar Servicio Contratado', content=~{::#form-editar-content}, styles=~{::form-editar-styles})}">
+
+<div id="form-editar-content">
+    <div class="breadcrumb">
+        <a th:href="@{/clientes}">Clientes</a>
+        <span class="separator">›</span>
+        <a th:href="@{/servicios-contratados/cuenta/{id}(id=${servicioContratado.cuentaCliente.id})}" 
+           th:text="${servicioContratado.cuentaCliente.cliente.razonSocial}">Cliente</a>
+        <span class="separator">›</span>
+        <span>Editar</span>
+    </div>
+
+    <div class="form-container">
+        <h1>Editar Servicio Contratado</h1>
+
+        <!-- Mensajes de error -->
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+        <!-- Información del servicio contratado -->
+        <div class="info-servicio">
+            <p><strong>Servicio/Plan:</strong> 
+                <span th:if="${servicioContratado.servicio != null}" th:text="${servicioContratado.servicio.nombre}">Servicio</span>
+                <span th:if="${servicioContratado.plan != null}" th:text="'Plan: ' + ${servicioContratado.plan.nombre}">Plan</span>
+            </p>
+            <p><strong>Precio Base:</strong> 
+                <span th:text="'$' + ${servicioContratado.servicio != null ? #numbers.formatDecimal(servicioContratado.servicio.precioBase, 1, 2) : #numbers.formatDecimal(servicioContratado.plan.precioBase, 1, 2)}">$100.00</span>
+            </p>
+            <p><strong>Fecha Inicio:</strong> 
+                <span th:text="${#temporals.format(servicioContratado.fechaInicio, 'dd/MM/yyyy')}">01/01/2025</span>
+            </p>
+        </div>
+
+        <form th:action="@{/servicios-contratados/modificar/{id}(id=${servicioContratado.id})}" method="post">
+            
+            <div class="form-group">
+                <label for="precioPersonalizado">Precio Personalizado</label>
+                <input type="number" id="precioPersonalizado" name="precioPersonalizado" 
+                       th:value="${servicioContratado.precioPersonalizado}"
+                       step="0.01" min="0" placeholder="Ej: 150.00">
+                <small class="form-help-text">Dejar vacío para usar el precio base del servicio/plan</small>
+            </div>
+
+            <div class="form-group">
+                <label for="descuento">Descuento</label>
+                <input type="number" id="descuento" name="descuento" 
+                       th:value="${servicioContratado.montoDescuento}"
+                       step="0.01" min="0" placeholder="Ej: 20.00">
+                <small class="form-help-text">Monto de descuento a aplicar</small>
+            </div>
+
+            <div class="info-precio-final">
+                <p><strong>Precio Final Actual:</strong> 
+                    <span class="precio-final" th:text="'$' + ${#numbers.formatDecimal(servicioContratado.calcularPrecioFinal(), 1, 2)}">$100.00</span>
+                </p>
+            </div>
+
+            <div class="form-actions">
+                <a th:href="@{/servicios-contratados/cuenta/{id}(id=${servicioContratado.cuentaCliente.id})}" 
+                   class="btn btn-secondary">❌ Cancelar</a>
+                <button type="submit" class="btn btn-primary">💾 Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<th:block th:fragment="form-editar-styles">
+    <link rel="stylesheet" th:href="@{/css/servicios-contratados-form.css}">
+</th:block>
+</html>

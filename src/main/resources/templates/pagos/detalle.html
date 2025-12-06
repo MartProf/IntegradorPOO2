@@ -1,0 +1,338 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(title='Detalle de Pago', content=~{::#pago-detalle-content}, styles=~{::pago-detalle-styles})}">
+
+<div id="pago-detalle-content">
+    <div class="page-header">
+        <h1 th:text="${titulo}">Detalle de Pago</h1>
+        <a th:href="@{/pagos}" class="btn btn-secondary">← Volver</a>
+    </div>
+
+    <div class="pago-container">
+        <!-- Información del Recibo -->
+        <div class="recibo-header">
+            <div class="recibo-numero">
+                <span class="label">Recibo N°:</span>
+                <span class="valor" th:text="${pago.numeroRecibo}">REC-2025-00000001</span>
+            </div>
+            <div class="recibo-fecha">
+                <span class="label">Fecha de Pago:</span>
+                <span class="valor" th:text="${#temporals.format(pago.fechaPago, 'dd/MM/yyyy')}">06/12/2025</span>
+            </div>
+        </div>
+
+        <!-- Información del Cliente -->
+        <div class="cliente-info">
+            <h3>Cliente</h3>
+            <div class="info-row">
+                <strong>Razón Social:</strong>
+                <span th:text="${pago.cuentaCliente.cliente.razonSocial}">Cliente S.A.</span>
+            </div>
+            <div class="info-row">
+                <strong>CUIT/DNI:</strong>
+                <span th:text="${pago.cuentaCliente.cliente.cuitDni}">20-12345678-9</span>
+            </div>
+            <div class="info-row">
+                <strong>Condición Fiscal:</strong>
+                <span th:text="${pago.cuentaCliente.cliente.condicionFiscal.descripcion}">Responsable Inscripto</span>
+            </div>
+        </div>
+
+        <!-- Resumen del Pago -->
+        <div class="pago-resumen">
+            <h3>Resumen del Pago</h3>
+            <div class="resumen-box">
+                <div class="resumen-item">
+                    <span class="resumen-label">Monto Total Pagado:</span>
+                    <span class="resumen-valor total">$<span th:text="${#numbers.formatDecimal(pago.montoTotal, 0, 'POINT', 2, 'COMMA')}">10,000.00</span></span>
+                </div>
+                <div class="resumen-item" th:if="${pago.observaciones != null and !pago.observaciones.isEmpty()}">
+                    <span class="resumen-label">Observaciones:</span>
+                    <span class="resumen-valor" th:text="${pago.observaciones}">Pago en efectivo</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detalle de Facturas Pagadas -->
+        <div class="facturas-pagadas">
+            <h3>Facturas Pagadas</h3>
+            <table class="detalle-table">
+                <thead>
+                    <tr>
+                        <th>Factura</th>
+                        <th>Fecha Emisión</th>
+                        <th>Total Factura</th>
+                        <th>Monto Pagado</th>
+                        <th>Medio de Pago</th>
+                        <th>Referencia</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${pago.itemsPago}">
+                        <td>
+                            <a th:href="@{/facturas/{id}(id=${item.factura.id})}" 
+                               class="link-factura"
+                               th:text="${item.factura.numero}">2025-12-00000001</a>
+                        </td>
+                        <td th:text="${#temporals.format(item.factura.fechaEmision, 'dd/MM/yyyy')}">01/12/2025</td>
+                        <td class="monto">$<span th:text="${#numbers.formatDecimal(item.factura.montoTotalFinal, 0, 'POINT', 2, 'COMMA')}">5,000.00</span></td>
+                        <td class="monto destacado">$<span th:text="${#numbers.formatDecimal(item.monto, 0, 'POINT', 2, 'COMMA')}">5,000.00</span></td>
+                        <td>
+                            <span class="badge-medio-pago" th:text="${item.medioPago.descripcion}">Efectivo</span>
+                        </td>
+                        <td>
+                            <span th:if="${item.referencia != null and !item.referencia.isEmpty()}" 
+                                  th:text="${item.referencia}">TRF-123456</span>
+                            <span th:if="${item.referencia == null or item.referencia.isEmpty()}" 
+                                  class="sin-referencia">-</span>
+                        </td>
+                        <td>
+                            <span class="badge-estado"
+                                  th:classappend="${'badge-' + item.factura.estado.name().toLowerCase()}"
+                                  th:text="${item.factura.estado.descripcion}">Pagada</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Total Final -->
+        <div class="total-final">
+            <div class="total-label">TOTAL PAGADO:</div>
+            <div class="total-monto">$<span th:text="${#numbers.formatDecimal(pago.montoTotal, 0, 'POINT', 2, 'COMMA')}">10,000.00</span></div>
+        </div>
+    </div>
+</div>
+
+<th:block th:fragment="pago-detalle-styles">
+    <style>
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .pago-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+
+        .recibo-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .recibo-numero, .recibo-fecha {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .recibo-header .label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 0.3rem;
+        }
+
+        .recibo-header .valor {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .cliente-info, .pago-resumen, .facturas-pagadas {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .cliente-info h3, .pago-resumen h3, .facturas-pagadas h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .info-row {
+            display: flex;
+            padding: 0.5rem 0;
+        }
+
+        .info-row strong {
+            min-width: 150px;
+            color: #555;
+        }
+
+        .resumen-box {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .resumen-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+        }
+
+        .resumen-label {
+            color: #555;
+            font-weight: 500;
+        }
+
+        .resumen-valor {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .resumen-valor.total {
+            font-size: 1.5rem;
+            color: #11998e;
+        }
+
+        .detalle-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .detalle-table thead {
+            background: #f8f9fa;
+        }
+
+        .detalle-table th {
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .detalle-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .detalle-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .link-factura {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .link-factura:hover {
+            text-decoration: underline;
+        }
+
+        .monto {
+            text-align: right;
+            font-weight: 500;
+        }
+
+        .monto.destacado {
+            color: #11998e;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .badge-medio-pago {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .badge-estado {
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-pendiente {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-pago_parcial {
+            background: #cfe2ff;
+            color: #084298;
+        }
+
+        .badge-pagada {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .badge-anulada {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .sin-referencia {
+            color: #999;
+            font-style: italic;
+        }
+
+        .total-final {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            padding: 1.5rem 2rem;
+            border-radius: 8px;
+            color: white;
+            margin-top: 2rem;
+        }
+
+        .total-label {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .total-monto {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+    </style>
+</th:block>
+
+</html>

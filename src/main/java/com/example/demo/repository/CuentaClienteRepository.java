@@ -1,7 +1,8 @@
 package com.example.demo.repository;
 
 import com.example.demo.model.CuentaCliente;
-import com.example.demo.model.EstadoCuenta;
+import com.example.demo.model.enums.EstadoCuenta;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -14,4 +14,11 @@ public interface IPlanService {
     Plan guardar(Plan plan);
     
     void eliminar(Long id);
+    
+    // Gestión de servicios incluidos en el plan
+    Plan agregarServicio(Long planId, Long servicioId);
+    
+    Plan removerServicio(Long planId, Long servicioId);
+    
+    Plan actualizarServiciosIncluidos(Long planId, List<Long> serviciosIds);
 }

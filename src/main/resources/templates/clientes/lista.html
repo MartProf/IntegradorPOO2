@@ -35,6 +35,9 @@
                     <td th:text="${cliente.condicionIVA}">RESPONSABLE_INSCRIPTO</td>
                     <td th:text="${cliente.telefono}">11-2345-6789</td>
                     <td>
+                        <a th:href="@{/servicios-contratados/cuenta/{id}(id=${cliente.cuentaCliente.id})}"
+                           class="btn-action btn-view"
+                           title="Ver Servicios Contratados">📋</a>
                         <a th:href="@{/clientes/editar/{id}(id=${cliente.id})}"
                            class="btn-action btn-edit"
                            title="Editar">✏️</a>

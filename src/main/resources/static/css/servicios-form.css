@@ -56,6 +56,12 @@
     border: 1px solid var(--border-color);
     border-radius: 4px;
     font-size: 1rem;
+    font-family: inherit;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
 }
 
 .form-group input:focus,

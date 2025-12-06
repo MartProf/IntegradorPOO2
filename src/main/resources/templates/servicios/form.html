@@ -30,6 +30,17 @@
             </div>
 
             <div class="form-group">
+                <label for="descripcion">Descripción</label>
+                <textarea 
+                    id="descripcion" 
+                    th:field="*{descripcion}" 
+                    placeholder="Ej: Conexión de fibra óptica 100 Mbps"
+                    rows="3"
+                    maxlength="500"></textarea>
+                <small class="form-help-text">Descripción detallada del servicio (opcional)</small>
+            </div>
+
+            <div class="form-group">
                 <label for="precioBase">
                     Precio Base
                     <span class="required-mark">*</span>

@@ -1,7 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.model.CuentaCliente;
-import com.example.demo.model.EstadoCuenta;
+import com.example.demo.model.enums.EstadoCuenta;
 import com.example.demo.repository.CuentaClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

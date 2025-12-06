@@ -1,0 +1,86 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(title='Facturas', content=~{::#facturas-content}, styles=~{::facturas-styles})}">
+
+<div id="facturas-content">
+    <div class="page-header">
+        <h1 th:text="${titulo}">Listado de Facturas</h1>
+        <a th:href="@{/facturas/generar}" class="btn btn-primary">📄 Generar Factura</a>
+    </div>
+
+    <!-- Filtros rápidos -->
+    <div class="filter-bar">
+        <a th:href="@{/facturas}" class="filter-btn">Todas</a>
+        <a th:href="@{/facturas/estado/pendiente}" class="filter-btn">Pendientes</a>
+        <a th:href="@{/facturas/estado/pagada}" class="filter-btn">Pagadas</a>
+        <a th:href="@{/facturas/vencidas}" class="filter-btn">Vencidas</a>
+        <a th:href="@{/facturas/buscar}" class="filter-btn">Buscar por Fecha</a>
+        <a th:href="@{/facturas/generar-masivas}" class="filter-btn filter-btn-danger">📄 Facturación Masiva</a>
+    </div>
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Número</th>
+                    <th>Tipo</th>
+                    <th>Cliente</th>
+                    <th>Fecha Emisión</th>
+                    <th>Vencimiento</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:if="${facturas.isEmpty()}">
+                    <td colspan="8" style="text-align: center; padding: 2rem; color: #666;">
+                        No hay facturas registradas
+                    </td>
+                </tr>
+                <tr th:each="factura : ${facturas}"
+                    th:classappend="${factura.estaVencida()} ? 'fila-vencida' : ''">
+                    <td th:text="${factura.numero}">2025-12-00000001</td>
+                    <td>
+                        <span class="badge-tipo-factura" 
+                              th:classappend="${'badge-' + factura.tipoFactura.name().toLowerCase()}"
+                              th:text="${factura.tipoFactura.descripcion}">
+                            Factura A
+                        </span>
+                    </td>
+                    <td th:text="${factura.cuentaCliente.cliente.razonSocial}">Cliente S.A.</td>
+                    <td th:text="${#temporals.format(factura.fechaEmision, 'dd/MM/yyyy')}">06/12/2025</td>
+                    <td th:text="${#temporals.format(factura.fechaVencimiento, 'dd/MM/yyyy')}">16/12/2025</td>
+                    <td th:text="${'$' + #numbers.formatDecimal(factura.montoTotalFinal, 1, 'POINT', 2, 'COMMA')}">$10.000,00</td>
+                    <td>
+                        <span class="badge-estado" 
+                              th:classappend="${'badge-' + factura.estado.name().toLowerCase()}"
+                              th:text="${factura.estado}">
+                            PENDIENTE
+                        </span>
+                    </td>
+                    <td>
+                        <a th:href="@{/facturas/{id}(id=${factura.id})}"
+                           class="btn-action btn-view"
+                           title="Ver Detalle">👁️</a>
+                        <a th:if="${factura.estado.name() == 'PENDIENTE'}"
+                           th:href="@{/facturas/{id}/pagar(id=${factura.id})}"
+                           class="btn-action btn-success"
+                           title="Marcar como Pagada"
+                           onclick="return confirm('¿Marcar como pagada?')">✓</a>
+                        <a th:if="${factura.estado.name() == 'PENDIENTE'}"
+                           th:href="@{/facturas/{id}/anular(id=${factura.id})}"
+                           class="btn-action btn-delete"
+                           title="Anular"
+                           onclick="return confirm('¿Anular esta factura?')">✗</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<th:block th:fragment="facturas-styles">
+    <link rel="stylesheet" th:href="@{/css/facturas-lista.css}">
+</th:block>
+
+</html>

@@ -1,0 +1,172 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(title='Resultado Facturación', content=~{::#resultado-content}, styles=~{::resultado-styles})}">
+
+<div id="resultado-content">
+    <div class="page-header">
+        <h1 th:text="${titulo}">Resultado de Facturación Masiva</h1>
+        <a th:href="@{/facturas}" class="btn btn-primary">Ver Facturas</a>
+    </div>
+
+    <div class="resultado-container">
+        <div class="resumen-box" th:classappend="${resultado.errores > 0} ? 'con-errores' : 'exitoso'">
+            <h2>📊 Resumen</h2>
+            <div class="estadisticas">
+                <div class="stat-item">
+                    <span class="stat-label">Cuentas Procesadas:</span>
+                    <span class="stat-value" th:text="${resultado.totalCuentasProcesadas}">0</span>
+                </div>
+                <div class="stat-item success">
+                    <span class="stat-label">Facturas Generadas:</span>
+                    <span class="stat-value" th:text="${resultado.facturasGeneradas}">0</span>
+                </div>
+                <div class="stat-item error" th:if="${resultado.errores > 0}">
+                    <span class="stat-label">Errores:</span>
+                    <span class="stat-value" th:text="${resultado.errores}">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Facturas generadas exitosamente -->
+        <div class="facturas-generadas" th:if="${!resultado.idsFacturasGeneradas.isEmpty()}">
+            <h3>✓ Facturas Generadas</h3>
+            <p>Se generaron <strong th:text="${resultado.facturasGeneradas}">0</strong> facturas correctamente.</p>
+            <div class="acciones">
+                <a th:href="@{/facturas}" class="btn btn-primary">Ver Todas las Facturas</a>
+            </div>
+        </div>
+
+        <!-- Errores -->
+        <div class="errores-box" th:if="${!resultado.mensajesError.isEmpty()}">
+            <h3>⚠️ Errores Encontrados</h3>
+            <ul class="error-list">
+                <li th:each="error : ${resultado.mensajesError}" th:text="${error}">
+                    Error al procesar cliente X
+                </li>
+            </ul>
+            <p class="error-info">
+                Revise los datos de estos clientes y genere sus facturas individualmente si es necesario.
+            </p>
+        </div>
+
+        <!-- Sin servicios activos -->
+        <div class="info-box" th:if="${resultado.totalCuentasProcesadas == 0}">
+            <h3>ℹ️ Sin Cuentas para Facturar</h3>
+            <p>No se encontraron clientes con servicios o planes activos para facturar.</p>
+            <p>Verifique que los clientes tengan servicios contratados activos.</p>
+        </div>
+    </div>
+</div>
+
+<th:block th:fragment="resultado-styles">
+    <link rel="stylesheet" th:href="@{/css/facturas-generar.css}">
+    <style>
+        .resultado-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .resumen-box {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .resumen-box.exitoso {
+            border-left: 4px solid #28a745;
+        }
+        
+        .resumen-box.con-errores {
+            border-left: 4px solid #ffc107;
+        }
+        
+        .resumen-box h2 {
+            margin-top: 0;
+            color: var(--dark-color);
+        }
+        
+        .estadisticas {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .stat-item {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .stat-item.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .stat-item.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .stat-label {
+            display: block;
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value {
+            display: block;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+        
+        .facturas-generadas, .errores-box {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .facturas-generadas {
+            border-left: 4px solid #28a745;
+        }
+        
+        .errores-box {
+            border-left: 4px solid #dc3545;
+        }
+        
+        .facturas-generadas h3, .errores-box h3 {
+            margin-top: 0;
+        }
+        
+        .error-list {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            padding: 1rem 1rem 1rem 2rem;
+            margin: 1rem 0;
+        }
+        
+        .error-list li {
+            margin-bottom: 0.5rem;
+            color: #721c24;
+        }
+        
+        .error-info {
+            color: #666;
+            font-style: italic;
+            margin-bottom: 0;
+        }
+        
+        .acciones {
+            margin-top: 1.5rem;
+        }
+    </style>
+</th:block>
+
+</html>

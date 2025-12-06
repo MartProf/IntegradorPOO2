@@ -2,6 +2,9 @@ package com.example.demo.model;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import com.example.demo.model.enums.EstadoCuenta;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

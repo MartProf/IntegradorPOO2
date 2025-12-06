@@ -1,6 +1,9 @@
 package com.example.demo.model;
 
 import java.time.LocalDate;
+
+import com.example.demo.model.enums.EstadoFactura;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

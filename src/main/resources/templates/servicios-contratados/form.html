@@ -1,0 +1,197 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(title='Contratar Servicio/Plan', content=~{::#form-content}, styles=~{::form-styles})}">
+
+<div id="form-content">
+    <div class="breadcrumb">
+        <a th:href="@{/clientes}">Clientes</a>
+        <span class="separator">›</span>
+        <a th:href="@{/servicios-contratados/cuenta/{id}(id=${cuenta.id})}" th:text="${cuenta.cliente.razonSocial}">Cliente</a>
+        <span class="separator">›</span>
+        <span>Contratar Servicio/Plan</span>
+    </div>
+
+    <div class="form-container">
+        <h1>Contratar Servicio o Plan</h1>
+
+        <!-- Mensajes de error -->
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+        <!-- Información de la cuenta -->
+        <div class="info-cuenta">
+            <p><strong>Cliente:</strong> <span th:text="${cuenta.cliente.razonSocial}">Empresa S.A.</span></p>
+            <p><strong>CUIT/DNI:</strong> <span th:text="${cuenta.cliente.cuitDni}">20-12345678-9</span></p>
+            <p><strong>Estado:</strong> <span th:text="${cuenta.estado}">ACTIVA</span></p>
+        </div>
+
+        <form th:action="@{/servicios-contratados/cuenta/{id}/guardar(id=${cuenta.id})}" method="post">
+            
+            <div class="form-group">
+                <label>¿Qué desea contratar? <span class="required-mark">*</span></label>
+                <div class="tipo-contratacion-selector">
+                    <div class="opcion-card" id="cardServicio" onclick="seleccionarTipo('servicio')">
+                        <input type="radio" name="tipoContratacion" value="servicio" id="radioServicio" checked>
+                        <label for="radioServicio">
+                            <div class="icono">🔧</div>
+                            <div class="titulo">Servicio Individual</div>
+                            <div class="descripcion">Contratá un servicio específico</div>
+                        </label>
+                    </div>
+                    <div class="opcion-card" id="cardPlan" onclick="seleccionarTipo('plan')">
+                        <input type="radio" name="tipoContratacion" value="plan" id="radioPlan">
+                        <label for="radioPlan">
+                            <div class="icono">📦</div>
+                            <div class="titulo">Plan</div>
+                            <div class="descripcion">Contratá un combo de servicios</div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Selección de Servicio -->
+            <div id="seccionServicio" class="form-group seccion-seleccion">
+                <label for="servicioId">
+                    Servicio a Contratar
+                    <span class="required-mark">*</span>
+                </label>
+                <select id="servicioId" name="servicioId" class="form-control" required>
+                    <option value="">-- Seleccione un servicio --</option>
+                    <option th:each="servicio : ${servicios}" 
+                            th:value="${servicio.id}" 
+                            th:text="${servicio.nombre + ' - $' + #numbers.formatDecimal(servicio.precioBase, 1, 2)}"
+                            th:attr="data-precio=${servicio.precioBase}">
+                        Servicio - $100.00
+                    </option>
+                </select>
+                <small class="form-help-text">📌 Seleccione el servicio individual que desea contratar</small>
+            </div>
+
+            <!-- Selección de Plan -->
+            <div id="seccionPlan" class="form-group seccion-seleccion" style="display: none;">
+                <label for="planId">
+                    Plan a Contratar
+                    <span class="required-mark">*</span>
+                </label>
+                <select id="planId" name="planId" class="form-control" disabled>
+                    <option value="">-- Seleccione un plan --</option>
+                    <option th:each="plan : ${planes}" 
+                            th:value="${plan.id}"
+                            th:attr="data-precio=${plan.precioBase}">
+                        <span th:text="${plan.nombre}">Plan</span> - 
+                        <span th:text="'$' + ${#numbers.formatDecimal(plan.precioBase, 1, 2)}">$0.00</span>
+                        <span th:if="${!plan.serviciosIncluidos.isEmpty()}" 
+                              th:text="' (incluye: ' + ${#strings.listJoin(plan.serviciosIncluidos.![nombre], ', ')} + ')'">
+                            (incluye servicios)
+                        </span>
+                    </option>
+                </select>
+                <small class="form-help-text">📦 Seleccione el plan (combo de servicios) que desea contratar</small>
+            </div>
+
+            <!-- Info de precio base dinámico -->
+            <div id="infoPrecio" class="info-precio" style="display: none;">
+                <strong>Precio estándar:</strong> <span id="precioBaseDisplay">$0.00</span>
+            </div>
+
+            <div class="form-group">
+                <label for="precioPersonalizado">Precio Personalizado (Opcional)</label>
+                <input type="number" id="precioPersonalizado" name="precioPersonalizado" 
+                       step="0.01" min="0" placeholder="Ej: 150.00">
+                <small class="form-help-text">Si desea aplicar un precio diferente al estándar</small>
+            </div>
+
+            <div class="form-group">
+                <label for="descuento">Descuento (Opcional)</label>
+                <input type="number" id="descuento" name="descuento" 
+                       step="0.01" min="0" placeholder="Ej: 20.00">
+                <small class="form-help-text">Monto de descuento a aplicar</small>
+            </div>
+
+            <div class="form-actions">
+                <a th:href="@{/servicios-contratados/cuenta/{id}(id=${cuenta.id})}" class="btn btn-secondary">❌ Cancelar</a>
+                <button type="submit" class="btn btn-primary">💾 Contratar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<th:block th:fragment="form-styles">
+    <link rel="stylesheet" th:href="@{/css/servicios-contratados-form.css}">
+    <script>
+        function seleccionarTipo(tipo) {
+            const cardServicio = document.getElementById('cardServicio');
+            const cardPlan = document.getElementById('cardPlan');
+            const radioServicio = document.getElementById('radioServicio');
+            const radioPlan = document.getElementById('radioPlan');
+            const seccionServicio = document.getElementById('seccionServicio');
+            const seccionPlan = document.getElementById('seccionPlan');
+            const servicioSelect = document.getElementById('servicioId');
+            const planSelect = document.getElementById('planId');
+            
+            if (tipo === 'servicio') {
+                // Activar servicio
+                radioServicio.checked = true;
+                cardServicio.classList.add('activo');
+                cardPlan.classList.remove('activo');
+                
+                // Mostrar sección servicio
+                seccionServicio.style.display = 'block';
+                seccionPlan.style.display = 'none';
+                
+                // Habilitar/deshabilitar selects
+                servicioSelect.disabled = false;
+                servicioSelect.required = true;
+                planSelect.disabled = true;
+                planSelect.required = false;
+                planSelect.value = '';
+            } else {
+                // Activar plan
+                radioPlan.checked = true;
+                cardPlan.classList.add('activo');
+                cardServicio.classList.remove('activo');
+                
+                // Mostrar sección plan
+                seccionServicio.style.display = 'none';
+                seccionPlan.style.display = 'block';
+                
+                // Habilitar/deshabilitar selects
+                planSelect.disabled = false;
+                planSelect.required = true;
+                servicioSelect.disabled = true;
+                servicioSelect.required = false;
+                servicioSelect.value = '';
+            }
+            
+            // Ocultar info de precio
+            document.getElementById('infoPrecio').style.display = 'none';
+        }
+        
+        function mostrarPrecio(select) {
+            const selectedOption = select.options[select.selectedIndex];
+            const precio = selectedOption.getAttribute('data-precio');
+            const infoPrecio = document.getElementById('infoPrecio');
+            const precioDisplay = document.getElementById('precioBaseDisplay');
+            
+            if (precio && precio !== '') {
+                precioDisplay.textContent = '$' + parseFloat(precio).toFixed(2);
+                infoPrecio.style.display = 'block';
+            } else {
+                infoPrecio.style.display = 'none';
+            }
+        }
+        
+        // Inicializar al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            seleccionarTipo('servicio');
+            
+            // Agregar listeners para mostrar precio
+            document.getElementById('servicioId').addEventListener('change', function() {
+                mostrarPrecio(this);
+            });
+            
+            document.getElementById('planId').addEventListener('change', function() {
+                mostrarPrecio(this);
+            });
+        });
+    </script>
+</th:block>
+</html>

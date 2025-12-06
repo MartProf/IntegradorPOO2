@@ -1,0 +1,44 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(title='Buscar Facturas', content=~{::#buscar-content}, styles=~{::buscar-styles})}">
+
+<div id="buscar-content">
+    <div class="page-header">
+        <h1 th:text="${titulo}">Buscar Facturas por Fecha</h1>
+        <a th:href="@{/facturas}" class="btn btn-secondary">← Volver</a>
+    </div>
+
+    <div class="form-container">
+        <form th:action="@{/facturas/buscar}" method="get">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="desde">Fecha Desde *</label>
+                    <input type="date" 
+                           id="desde" 
+                           name="desde" 
+                           class="form-control" 
+                           required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="hasta">Fecha Hasta *</label>
+                    <input type="date" 
+                           id="hasta" 
+                           name="hasta" 
+                           class="form-control" 
+                           required>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">🔍 Buscar</button>
+                <a th:href="@{/facturas}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<th:block th:fragment="buscar-styles">
+    <link rel="stylesheet" th:href="@{/css/facturas-buscar.css}">
+</th:block>
+
+</html>

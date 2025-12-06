@@ -14,19 +14,54 @@
                 <tr>
                     <th>ID</th>
                     <th>Nombre</th>
-                    <th>Precio Base</th>
+                    <th>Descripción</th>
+                    <th>Servicios Incluidos</th>
+                    <th>Precio Individual</th>
+                    <th>Precio Plan</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 <tr th:if="${planes.isEmpty()}">
-                    <td colspan="4" style="text-align: center; padding: 2rem; color: #666;">
+                    <td colspan="7" style="text-align: center; padding: 2rem; color: #666;">
                         No hay planes registrados
                     </td>
                 </tr>
                 <tr th:each="plan : ${planes}">
                     <td th:text="${plan.id}">1</td>
                     <td th:text="${plan.nombre}">Plan Básico</td>
+                    <td>
+                        <span th:if="${plan.descripcion != null and !plan.descripcion.isEmpty()}" 
+                              th:text="${plan.descripcion}">Descripción</span>
+                        <span th:if="${plan.descripcion == null or plan.descripcion.isEmpty()}" 
+                              class="text-muted" style="font-style: italic;">Sin descripción</span>
+                    </td>
+                    <td>
+                        <div class="servicios-incluidos">
+                            <span th:if="${plan.serviciosIncluidos.isEmpty()}" class="no-servicios-badge">
+                                Sin servicios
+                            </span>
+                            <div th:if="${!plan.serviciosIncluidos.isEmpty()}" class="servicios-badges">
+                                <span th:each="servicio : ${plan.serviciosIncluidos}" 
+                                      class="servicio-badge"
+                                      th:text="${servicio.nombre}"
+                                      th:title="${'$' + #numbers.formatDecimal(servicio.precioBase, 1, 2)}">
+                                    Servicio
+                                </span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span th:if="${!plan.serviciosIncluidos.isEmpty()}" 
+                              class="precio-individual"
+                              th:text="${'$' + #numbers.formatDecimal(plan.calcularPrecioServiciosIndividuales(), 1, 2)}">
+                            $0.00
+                        </span>
+                        <span th:if="${plan.serviciosIncluidos.isEmpty()}" 
+                              class="sin-ahorro">
+                            -
+                        </span>
+                    </td>
                     <td th:text="${'$' + #numbers.formatDecimal(plan.precioBase, 1, 2)}">$5000.00</td>
                     <td>
                         <a th:href="@{/planes/editar/{id}(id=${plan.id})}" 

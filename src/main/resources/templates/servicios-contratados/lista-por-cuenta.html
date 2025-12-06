@@ -1,0 +1,107 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(title='Servicios Contratados', content=~{::#servicios-contratados-content}, styles=~{::servicios-contratados-styles})}">
+
+<div id="servicios-contratados-content">
+    <div class="breadcrumb">
+        <a th:href="@{/clientes}">Clientes</a>
+        <span class="separator">›</span>
+        <span th:text="${cuenta.cliente.razonSocial}">Cliente</span>
+        <span class="separator">›</span>
+        <span>Servicios Contratados</span>
+    </div>
+
+    <div class="page-header">
+        <h1>Servicios Contratados</h1>
+        <a th:href="@{/servicios-contratados/cuenta/{id}/nuevo(id=${cuenta.id})}" class="btn btn-primary">➕ Contratar Servicio/Plan</a>
+    </div>
+
+    <!-- Información de la cuenta -->
+    <div class="info-cuenta">
+        <div class="info-item">
+            <strong>Cliente:</strong> 
+            <span th:text="${cuenta.cliente.razonSocial}">Empresa S.A.</span>
+        </div>
+        <div class="info-item">
+            <strong>CUIT/DNI:</strong> 
+            <span th:text="${cuenta.cliente.cuitDni}">20-12345678-9</span>
+        </div>
+        <div class="info-item">
+            <strong>Estado de Cuenta:</strong> 
+            <span th:text="${cuenta.estado}" class="badge" th:classappend="${cuenta.estado.name() == 'ACTIVA' ? 'badge-success' : 'badge-danger'}">ACTIVA</span>
+        </div>
+        <div class="info-item">
+            <strong>Deuda Pendiente:</strong> 
+            <span th:text="'$' + ${#numbers.formatDecimal(cuenta.deudaPendiente, 1, 2)}">$0.00</span>
+        </div>
+    </div>
+
+    <!-- Mensajes de éxito o error -->
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tipo</th>
+                    <th>Servicio/Plan</th>
+                    <th>Precio Base</th>
+                    <th>Precio Personalizado</th>
+                    <th>Descuento</th>
+                    <th>Precio Final</th>
+                    <th>Fecha Inicio</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:if="${serviciosContratados.isEmpty()}">
+                    <td colspan="9" style="text-align: center; padding: 2rem; color: #666;">
+                        No hay servicios contratados para esta cuenta
+                    </td>
+                </tr>
+                <tr th:each="sc : ${serviciosContratados}">
+                    <td th:text="${sc.id}">1</td>
+                    <td>
+                        <span th:if="${sc.esPlan()}" class="badge badge-plan">📦 Plan</span>
+                        <span th:if="${sc.esServicioIndividual()}" class="badge badge-servicio">🔧 Servicio</span>
+                    </td>
+                    <td>
+                        <strong th:text="${sc.nombreContratado}">Nombre</strong>
+                        <!-- Si es plan, mostrar servicios incluidos -->
+                        <div th:if="${sc.esPlan() and sc.plan.serviciosIncluidos != null and !sc.plan.serviciosIncluidos.isEmpty()}" class="servicios-incluidos-small">
+                            <small th:each="servicio, iterStat : ${sc.plan.serviciosIncluidos}" 
+                                   th:text="${servicio.nombre + (iterStat.last ? '' : ', ')}">Servicio</small>
+                        </div>
+                    </td>
+                    <td>
+                        <span th:if="${sc.plan != null}" th:text="'$' + ${#numbers.formatDecimal(sc.plan.precioBase, 1, 2)}">$0.00</span>
+                        <span th:if="${sc.servicio != null}" th:text="'$' + ${#numbers.formatDecimal(sc.servicio.precioBase, 1, 2)}">$0.00</span>
+                    </td>
+                    <td th:text="${sc.precioPersonalizado != null ? '$' + #numbers.formatDecimal(sc.precioPersonalizado, 1, 2) : '-'}">-</td>
+                    <td th:text="'$' + ${#numbers.formatDecimal(sc.montoDescuento, 1, 2)}">$0.00</td>
+                    <td th:text="'$' + ${#numbers.formatDecimal(sc.calcularPrecioFinal(), 1, 2)}">$100.00</td>
+                    <td th:text="${#temporals.format(sc.fechaInicio, 'dd/MM/yyyy')}">01/01/2025</td>
+                    <td>
+                        <a th:href="@{/servicios-contratados/editar/{id}(id=${sc.id})}"
+                           class="btn-action btn-edit"
+                           title="Editar">✏️</a>
+                        <a th:href="@{/servicios-contratados/cancelar/{id}(id=${sc.id})}"
+                           class="btn-action btn-delete"
+                           title="Cancelar"
+                           onclick="return confirm('¿Está seguro de cancelar este servicio contratado?')">🗑️</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="form-actions">
+        <a th:href="@{/clientes}" class="btn btn-secondary">← Volver a Clientes</a>
+    </div>
+</div>
+
+<th:block th:fragment="servicios-contratados-styles">
+    <link rel="stylesheet" th:href="@{/css/servicios-contratados-lista.css}">
+</th:block>
+</html>

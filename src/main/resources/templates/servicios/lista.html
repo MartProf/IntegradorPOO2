@@ -14,6 +14,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Nombre</th>
+                    <th>Descripción</th>
                     <th>Precio Base</th>
                     <th>Alícuota IVA</th>
                     <th>Acciones</th>
@@ -21,13 +22,19 @@
             </thead>
             <tbody>
                 <tr th:if="${servicios.isEmpty()}">
-                    <td colspan="5" style="text-align: center; padding: 2rem; color: #666;">
+                    <td colspan="6" style="text-align: center; padding: 2rem; color: #666;">
                         No hay servicios registrados
                     </td>
                 </tr>
                 <tr th:each="servicio : ${servicios}">
                     <td th:text="${servicio.id}">1</td>
                     <td th:text="${servicio.nombre}">Internet 100Mb</td>
+                    <td>
+                        <span th:if="${servicio.descripcion != null and !servicio.descripcion.isEmpty()}" 
+                              th:text="${servicio.descripcion}">Descripción</span>
+                        <span th:if="${servicio.descripcion == null or servicio.descripcion.isEmpty()}" 
+                              class="text-muted" style="font-style: italic;">Sin descripción</span>
+                    </td>
                     <td th:text="${'$' + #numbers.formatDecimal(servicio.precioBase, 1, 2)}">$5000.00</td>
                     <td th:text="${#numbers.formatDecimal(servicio.alicuotaIVA, 1, 2) + '%'}">21.00%</td>
                     <td>
