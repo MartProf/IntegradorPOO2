@@ -199,7 +199,6 @@ El sistema implementa las siguientes entidades principales:
 - **Pago**: Registro de pagos realizados
 - **ItemPago**: Detalle de medios de pago utilizados
 - **NotaCredito**: Anulaciones de facturas
-- **Recibo**: Comprobantes de pago
 - **Usuario**: Usuarios del sistema
 
 Para más detalles, consultar el diagrama de clases en `docs/img/Diagrama de clases.jpg`.
