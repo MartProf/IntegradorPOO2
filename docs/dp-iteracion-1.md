@@ -6,7 +6,7 @@
 * **Federico:** Desarrollo de los ABM de Clientes y Servicios.
 
 # Diseño OO
-![Diagrama de clases](img/Diagrama%20de%20clases.jpg)
+![Diagrama de clases](img/Diagrama%20de%20clases.png)
 
 # Wireframe y caso de uso
 

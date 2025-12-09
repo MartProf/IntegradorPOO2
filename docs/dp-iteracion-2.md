@@ -6,7 +6,7 @@
 * **Martin:** Integración de vistas, mejoras en layout Thymeleaf y pruebas del sistema.
 
 # Diseño OO
-![Diagrama de clases](img/Diagrama%20de%20clases.jpg)
+![Diagrama de clases](img/Diagrama%20de%20clases.png)
 
 # Wireframe y caso de uso
 
