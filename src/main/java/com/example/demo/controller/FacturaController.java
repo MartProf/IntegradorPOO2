@@ -179,6 +179,9 @@ public class FacturaController {
     @GetMapping("/generar-masivas")
     public String mostrarConfirmacionMasiva(Model model) {
         model.addAttribute("titulo", "Facturación Masiva");
+        // Pasar mes y año actual por defecto
+        model.addAttribute("mesActual", LocalDate.now().getMonthValue());
+        model.addAttribute("anioActual", LocalDate.now().getYear());
         return "facturas/generar-masivas";
     }
     
@@ -186,9 +189,11 @@ public class FacturaController {
      * Genera facturas para todos los clientes con servicios activos
      */
     @PostMapping("/generar-masivas")
-    public String generarFacturasMasivas(Model model, RedirectAttributes flash) {
+    public String generarFacturasMasivas(@RequestParam int mes, 
+                                         @RequestParam int anio,
+                                         Model model, RedirectAttributes flash) {
         try {
-            com.example.demo.dto.ResultadoFacturacionMasiva resultado = facturaService.generarFacturasMasivas();
+            com.example.demo.dto.ResultadoFacturacionMasiva resultado = facturaService.generarFacturasMasivas(mes, anio);
             
             model.addAttribute("resultado", resultado);
             model.addAttribute("titulo", "Resultado de Facturación Masiva");

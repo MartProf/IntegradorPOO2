@@ -3,67 +3,277 @@
 
 <div id="dashboard-content">
     <div class="dashboard-header">
-        <h1>Bienvenido al Sistema de Gestión</h1>
-        <p class="subtitle">Panel de control principal</p>
+        <h1>🏠 Panel de Control</h1>
+        <p class="subtitle">Sistema de Gestión de Facturación</p>
     </div>
 
-    <!-- Cards de acceso rápido -->
-    <div class="dashboard-grid">
-        <!-- Card Clientes -->
-        <div class="dashboard-card">
-            <div class="card-icon clientes">👥</div>
-            <div class="card-content">
-                <h3>Clientes</h3>
-                <p>Gestionar clientes y cuentas</p>
-                <div class="card-actions">
-                    <a th:href="@{/clientes}" class="btn btn-primary">Ver Todos</a>
-                    <a th:href="@{/clientes/nuevo}" class="btn btn-secondary">Nuevo Cliente</a>
-                </div>
-            </div>
+    <!-- Estadísticas -->
+    <div class="stats-container">
+        <div class="stat-box">
+            <h3 th:text="${totalClientes}">0</h3>
+            <p>Clientes Registrados</p>
         </div>
-
-        <!-- Card Facturas -->
-        <div class="dashboard-card">
-            <div class="card-icon facturas">📄</div>
-            <div class="card-content">
-                <h3>Facturas</h3>
-                <p>Facturación individual y masiva</p>
-                <div class="card-actions">
-                    <a th:href="@{/facturas}" class="btn btn-primary">Ver Todas</a>
-                    <a th:href="@{/facturas/nueva}" class="btn btn-secondary">Nueva Factura</a>
-                </div>
-            </div>
+        
+        <div class="stat-box">
+            <h3 th:text="${totalFacturas}">0</h3>
+            <p>Total Facturas</p>
         </div>
-
-        <!-- Card Pagos -->
-        <div class="dashboard-card">
-            <div class="card-icon pagos">💳</div>
-            <div class="card-content">
-                <h3>Pagos</h3>
-                <p>Registrar y consultar pagos</p>
-                <div class="card-actions">
-                    <a th:href="@{/pagos}" class="btn btn-primary">Ver Todos</a>
-                    <a th:href="@{/pagos/nuevo}" class="btn btn-secondary">Registrar Pago</a>
-                </div>
-            </div>
+        
+        <div class="stat-box stat-highlight">
+            <h3 th:text="${facturasPendientes}">0</h3>
+            <p>Facturas Pendientes</p>
         </div>
-
-        <!-- Card Servicios -->
-        <div class="dashboard-card">
-            <div class="card-icon servicios">🔧</div>
-            <div class="card-content">
-                <h3>Servicios y Planes</h3>
-                <p>Administrar servicios y planes</p>
-                <div class="card-actions">
-                    <a th:href="@{/planes}" class="btn btn-primary">Planes</a>
-                    <a th:href="@{/servicios}" class="btn btn-secondary">Servicios</a>
-                </div>
-            </div>
+        
+        <div class="stat-box stat-alert">
+            <h3 th:text="${facturasVencidas}">0</h3>
+            <p>Facturas Vencidas</p>
+        </div>
+        
+        <div class="stat-box">
+            <h3 th:text="${totalPagos}">0</h3>
+            <p>Pagos Registrados</p>
+        </div>
+        
+        <div class="stat-box">
+            <h3 th:text="${totalNotasCredito}">0</h3>
+            <p>Notas de Crédito</p>
+        </div>
+        
+        <div class="stat-box stat-money">
+            <h3 th:text="${'$' + #numbers.formatDecimal(deudaTotal, 1, 'POINT', 0, 'COMMA')}">$0</h3>
+            <p>Deuda Total Pendiente</p>
         </div>
     </div>
+
+    <!-- Accesos Rápidos -->
+    <div class="quick-actions">
+        <h2>⚡ Accesos Rápidos</h2>
+        <div class="actions-grid">
+            <a th:href="@{/clientes/nuevo}" class="action-btn action-primary">
+                <span class="action-icon">➕</span>
+                <span>Nuevo Cliente</span>
+            </a>
+            <a th:href="@{/facturas/generar}" class="action-btn action-success">
+                <span class="action-icon">📄</span>
+                <span>Generar Factura</span>
+            </a>
+            <a th:href="@{/facturas/generar-masivas}" class="action-btn action-danger">
+                <span class="action-icon">📋</span>
+                <span>Facturación Masiva</span>
+            </a>
+            <a th:href="@{/pagos/registrar}" class="action-btn action-info">
+                <span class="action-icon">💳</span>
+                <span>Registrar Pago</span>
+            </a>
+        </div>
+    </div>
+
 </div>
 
 <th:block th:fragment="dashboard-styles">
-    <link rel="stylesheet" th:href="@{/css/dashboard-home.css}">
+    <style>
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .dashboard-header h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        /* Estadísticas */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+        
+        .stat-box {
+            background: white;
+            padding: 1.2rem 0.8rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-box:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .stat-box h3 {
+            margin: 0 0 0.3rem 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .stat-box p {
+            margin: 0;
+            font-size: 0.75rem;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .stat-box.stat-highlight {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+        }
+        
+        .stat-box.stat-highlight h3 {
+            color: #ff9800;
+        }
+        
+        .stat-box.stat-alert {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+        }
+        
+        .stat-box.stat-alert h3 {
+            color: #f44336;
+        }
+        
+        .stat-box.stat-money {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        }
+        
+        .stat-box.stat-money h3 {
+            color: #4caf50;
+        }
+        
+        /* Accesos Rápidos */
+        .quick-actions {
+            margin-bottom: 3rem;
+        }
+        
+        .quick-actions h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .action-btn {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+        
+        .action-icon {
+            font-size: 2rem;
+        }
+        
+        .action-primary { background: linear-gradient(135deg, #2196f3, #1976d2); }
+        .action-success { background: linear-gradient(135deg, #4caf50, #388e3c); }
+        .action-danger { background: linear-gradient(135deg, #f44336, #d32f2f); }
+        .action-info { background: linear-gradient(135deg, #00bcd4, #0097a7); }
+        
+        /* Módulos */
+        .modules-section {
+            margin-bottom: 2rem;
+        }
+        
+        .modules-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .module-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            border-top: 4px solid;
+        }
+        
+        .module-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .module-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .module-icon {
+            font-size: 2rem;
+        }
+        
+        .module-header h3 {
+            margin: 0;
+            font-size: 1.3rem;
+        }
+        
+        .module-desc {
+            color: #666;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+        
+        .module-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .module-links a {
+            color: #2196f3;
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        
+        .module-links a:hover {
+            background: #f5f5f5;
+        }
+        
+        .module-primary { border-top-color: #2196f3; }
+        .module-success { border-top-color: #4caf50; }
+        .module-info { border-top-color: #00bcd4; }
+        .module-purple { border-top-color: #9c27b0; }
+        .module-warning { border-top-color: #ff9800; }
+        .module-teal { border-top-color: #009688; }
+    </style>
 </th:block>
 </html>

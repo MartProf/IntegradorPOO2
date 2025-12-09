@@ -8,26 +8,61 @@
     </div>
 
     <div class="confirmacion-container">
-        <div class="warning-box">
-            <h3>⚠️ Atención</h3>
-            <p>Está por generar facturas para <strong>todos los clientes</strong> que tienen servicios o planes activos.</p>
-        </div>
-
-        <div class="info-box">
-            <h4>ℹ️ Este proceso:</h4>
-            <ul>
-                <li>Generará una factura individual para cada cliente con servicios activos</li>
-                <li>Calculará automáticamente el tipo de factura (A, B o C) según la condición fiscal</li>
-                <li>Actualizará la deuda de cada cuenta</li>
-                <li>Generará números de factura secuenciales</li>
-                <li>Puede tomar varios segundos si hay muchos clientes</li>
-            </ul>
-            <p><strong>Esta operación no se puede deshacer.</strong></p>
-        </div>
-
         <form th:action="@{/facturas/generar-masivas}" method="post">
+            <div class="form-group periodo-selector">
+                <label class="form-label">📅 Seleccione el período de facturación:</label>
+                <div class="fecha-selectores">
+                    <div class="select-wrapper">
+                        <label for="mes">Mes:</label>
+                        <select id="mes" name="mes" th:value="${mesActual}" required>
+                            <option value="1">Enero</option>
+                            <option value="2">Febrero</option>
+                            <option value="3">Marzo</option>
+                            <option value="4">Abril</option>
+                            <option value="5">Mayo</option>
+                            <option value="6">Junio</option>
+                            <option value="7">Julio</option>
+                            <option value="8">Agosto</option>
+                            <option value="9">Septiembre</option>
+                            <option value="10">Octubre</option>
+                            <option value="11">Noviembre</option>
+                            <option value="12">Diciembre</option>
+                        </select>
+                    </div>
+                    
+                    <div class="select-wrapper">
+                        <label for="anio">Año:</label>
+                        <select id="anio" name="anio" th:value="${anioActual}" required>
+                            <option value="2023">2023</option>
+                            <option value="2024">2024</option>
+                            <option value="2025" selected>2025</option>
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <h3>⚠️ Atención</h3>
+                <p>Está por generar facturas para <strong>todos los clientes</strong> que tienen servicios o planes activos en el período seleccionado.</p>
+            </div>
+
+            <div class="info-box">
+                <h4>ℹ️ Este proceso:</h4>
+                <ul>
+                    <li>Generará una factura individual para cada cliente con servicios activos</li>
+                    <li>Solo facturará servicios que estén activos en el mes/año seleccionado</li>
+                    <li>Calculará automáticamente el tipo de factura (A, B o C) según la condición fiscal</li>
+                    <li>Actualizará la deuda de cada cuenta</li>
+                    <li>Generará números de factura secuenciales</li>
+                    <li>Puede tomar varios segundos si hay muchos clientes</li>
+                </ul>
+                <p><strong>Esta operación no se puede deshacer.</strong></p>
+            </div>
+            
             <div class="form-actions">
-                <button type="submit" class="btn btn-danger" onclick="return confirm('¿Confirma generar facturas masivas para todos los clientes?')">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('¿Confirma generar facturas masivas para el período seleccionado?')">
                     📄 Generar Facturas Masivas
                 </button>
                 <a th:href="@{/facturas}" class="btn btn-secondary">Cancelar</a>
@@ -70,7 +105,78 @@
         .btn-danger:hover {
             background: #c82333;
         }
+        
+        .periodo-selector {
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .periodo-selector .form-label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: white;
+            font-size: 1.3rem;
+            text-align: center;
+        }
+        
+        .fecha-selectores {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            align-items: flex-end;
+        }
+        
+        .select-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .select-wrapper label {
+            color: white;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .select-wrapper select {
+            padding: 0.75rem 1.5rem;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            min-width: 180px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+        
+        .select-wrapper select:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        }
+        
+        .select-wrapper select:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
+        }
     </style>
+    
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Seleccionar mes y año actual por defecto
+            const mesActual = /*[[${mesActual}]]*/ new Date().getMonth() + 1;
+            const anioActual = /*[[${anioActual}]]*/ new Date().getFullYear();
+            
+            document.getElementById('mes').value = mesActual;
+            document.getElementById('anio').value = anioActual;
+        });
+    </script>
 </th:block>
 
 </html>

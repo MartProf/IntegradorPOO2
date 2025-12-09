@@ -1,0 +1,340 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(title='Generar NC', content=~{::#nc-generar-content}, styles=~{::nc-generar-styles})}">
+
+<div id="nc-generar-content">
+    <div class="page-header">
+        <h1 th:text="${titulo}">Generar Nota de Crédito</h1>
+        <a th:href="@{/facturas/{id}(id=${factura.id})}" class="btn btn-secondary">← Volver a Factura</a>
+    </div>
+
+    <div class="form-container">
+        <!-- Advertencia -->
+        <div class="warning-box">
+            <h3>⚠️ IMPORTANTE</h3>
+            <p>Está por generar una <strong>Nota de Crédito</strong> que anulará formalmente la factura seleccionada.</p>
+            <ul>
+                <li>La factura pasará al estado <strong>ANULADA POR NC</strong></li>
+                <li>El monto será <strong>revertido de la deuda</strong> del cliente</li>
+                <li>Esta operación <strong>NO SE PUEDE DESHACER</strong></li>
+                <li>Se generará un documento con número secuencial</li>
+            </ul>
+        </div>
+
+        <!-- Resumen de la Factura a Anular -->
+        <div class="factura-summary">
+            <h3>📄 Factura a Anular</h3>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <span class="summary-label">Número:</span>
+                    <span class="summary-value" th:text="${factura.numero}">2025-12-00000001</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Tipo:</span>
+                    <span class="badge-tipo-factura" 
+                          th:classappend="${'badge-' + factura.tipoFactura.name().toLowerCase()}"
+                          th:text="${factura.tipoFactura.descripcion}">
+                        Factura A
+                    </span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Cliente:</span>
+                    <span class="summary-value" th:text="${factura.cuentaCliente.cliente.razonSocial}">Cliente S.A.</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">CUIT/DNI:</span>
+                    <span class="summary-value" th:text="${factura.cuentaCliente.cliente.cuitDni}">20-12345678-9</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Fecha Emisión:</span>
+                    <span class="summary-value" th:text="${#temporals.format(factura.fechaEmision, 'dd/MM/yyyy')}">06/12/2025</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Estado Actual:</span>
+                    <span class="badge-estado badge-pendiente" th:text="${factura.estado}">PENDIENTE</span>
+                </div>
+            </div>
+            
+            <div class="monto-destacado">
+                <span class="monto-label">Monto Total a Acreditar:</span>
+                <span class="monto-valor" 
+                      th:text="${'$' + #numbers.formatDecimal(factura.montoTotalFinal, 1, 'POINT', 2, 'COMMA')}">
+                    $10.000,00
+                </span>
+            </div>
+        </div>
+
+        <!-- Formulario -->
+        <form th:action="@{/notas-credito/generar}" method="post" id="formNC">
+            <input type="hidden" name="facturaId" th:value="${factura.id}">
+            
+            <div class="form-group">
+                <label for="motivo" class="form-label required">
+                    📝 Motivo de la Anulación
+                    <span class="label-help">(Mínimo 10 caracteres - Obligatorio para auditoría)</span>
+                </label>
+                <textarea id="motivo" 
+                          name="motivo" 
+                          class="form-control" 
+                          rows="5" 
+                          required
+                          minlength="10"
+                          maxlength="500"
+                          placeholder="Ejemplo: Error en el importe facturado. Se emitirá nueva factura con el monto correcto..."></textarea>
+                <div class="char-counter">
+                    <span id="charCount">0</span> / 500 caracteres
+                    <span id="charMin" class="char-warning">(Mínimo: 10)</span>
+                </div>
+            </div>
+
+            <div class="confirm-checkbox">
+                <label>
+                    <input type="checkbox" id="confirmacion" required>
+                    <span>Confirmo que he verificado la información y deseo generar la Nota de Crédito</span>
+                </label>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-danger" id="btnGenerar" disabled>
+                    📄 Generar Nota de Crédito
+                </button>
+                <a th:href="@{/facturas/{id}(id=${factura.id})}" class="btn btn-secondary">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<th:block th:fragment="nc-generar-styles">
+    <style>
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .warning-box h3 {
+            margin-top: 0;
+            color: #856404;
+        }
+        
+        .warning-box p {
+            color: #856404;
+            margin: 0.5rem 0;
+        }
+        
+        .warning-box ul {
+            margin: 1rem 0 0.5rem 0;
+            color: #856404;
+        }
+        
+        .warning-box li {
+            margin: 0.5rem 0;
+        }
+        
+        .factura-summary {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .factura-summary h3 {
+            margin-top: 0;
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .summary-label {
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: 600;
+        }
+        
+        .summary-value {
+            font-size: 1rem;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .monto-destacado {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .monto-label {
+            font-size: 1.1rem;
+        }
+        
+        .monto-valor {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        .form-group {
+            margin-bottom: 2rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        
+        .form-label.required::after {
+            content: ' *';
+            color: #f44336;
+        }
+        
+        .label-help {
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: 400;
+            display: block;
+            margin-top: 0.25rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #2196f3;
+        }
+        
+        .form-control:invalid:not(:placeholder-shown) {
+            border-color: #f44336;
+        }
+        
+        .char-counter {
+            text-align: right;
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+        
+        .char-warning {
+            color: #f44336;
+            font-weight: 600;
+        }
+        
+        .confirm-checkbox {
+            background: #e3f2fd;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 2rem;
+        }
+        
+        .confirm-checkbox label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+        }
+        
+        .confirm-checkbox input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+        
+        .btn-danger:hover:not(:disabled) {
+            background: #d32f2f;
+        }
+        
+        .btn-danger:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+    
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const motivo = document.getElementById('motivo');
+            const charCount = document.getElementById('charCount');
+            const charMin = document.getElementById('charMin');
+            const confirmacion = document.getElementById('confirmacion');
+            const btnGenerar = document.getElementById('btnGenerar');
+            
+            // Contador de caracteres
+            motivo.addEventListener('input', function() {
+                const length = this.value.length;
+                charCount.textContent = length;
+                
+                if (length >= 10) {
+                    charMin.style.display = 'none';
+                    charCount.style.color = '#4caf50';
+                } else {
+                    charMin.style.display = 'inline';
+                    charCount.style.color = '#f44336';
+                }
+                
+                validarFormulario();
+            });
+            
+            // Validación del checkbox
+            confirmacion.addEventListener('change', validarFormulario);
+            
+            function validarFormulario() {
+                const motivoValido = motivo.value.trim().length >= 10;
+                const confirmado = confirmacion.checked;
+                
+                btnGenerar.disabled = !(motivoValido && confirmado);
+            }
+            
+            // Confirmación antes de enviar
+            document.getElementById('formNC').addEventListener('submit', function(e) {
+                if (!confirm('¿Está seguro que desea generar la Nota de Crédito? Esta acción NO SE PUEDE DESHACER.')) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+</th:block>
+
+</html>

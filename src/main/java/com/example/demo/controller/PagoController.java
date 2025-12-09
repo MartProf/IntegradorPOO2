@@ -7,6 +7,7 @@ import com.example.demo.model.enums.MedioPago;
 import com.example.demo.service.IPagoService;
 import com.example.demo.service.IFacturaService;
 import com.example.demo.service.ICuentaClienteService;
+import com.example.demo.repository.ItemPagoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,6 +34,9 @@ public class PagoController {
     
     @Autowired
     private ICuentaClienteService cuentaClienteService;
+    
+    @Autowired
+    private ItemPagoRepository itemPagoRepository;
     
     /**
      * Lista todos los pagos
@@ -84,11 +88,22 @@ public class PagoController {
             List.of(EstadoFactura.PENDIENTE, EstadoFactura.PAGO_PARCIAL));
         
         return facturas.stream().map(f -> {
+            // Calcular cuánto se ha pagado de esta factura
+            Double totalPagado = itemPagoRepository.calcularTotalPagadoPorFactura(f.getId());
+            if (totalPagado == null) {
+                totalPagado = 0.0;
+            }
+            
+            // Calcular el saldo pendiente
+            Double saldoPendiente = f.getMontoTotalFinal() - totalPagado;
+            
             Map<String, Object> map = new HashMap<>();
             map.put("id", f.getId());
             map.put("numero", f.getNumero());
             map.put("fechaEmision", f.getFechaEmision().toString());
             map.put("montoTotal", f.getMontoTotalFinal());
+            map.put("montoPagado", totalPagado);
+            map.put("saldoPendiente", saldoPendiente);
             map.put("estado", f.getEstado().name());
             return map;
         }).collect(Collectors.toList());

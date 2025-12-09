@@ -90,8 +90,10 @@ public interface IFacturaService {
     String generarNumeroFactura();
     
     /**
-     * Genera facturas para todos los clientes con servicios activos
+     * Genera facturas para todos los clientes con servicios activos en un período
+     * @param mes Mes de facturación (1-12)
+     * @param anio Año de facturación
      * @return Resultado con estadísticas de la facturación masiva
      */
-    ResultadoFacturacionMasiva generarFacturasMasivas();
+    ResultadoFacturacionMasiva generarFacturasMasivas(int mes, int anio);
 }

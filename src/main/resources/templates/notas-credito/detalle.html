@@ -1,0 +1,321 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(title='Detalle NC', content=~{::#nc-detalle-content}, styles=~{::nc-detalle-styles})}">
+
+<div id="nc-detalle-content">
+    <div class="page-header">
+        <h1 th:text="${titulo}">Detalle de Nota de Crédito</h1>
+        <div class="header-actions">
+            <a th:href="@{/notas-credito}" class="btn btn-secondary">← Volver al Listado</a>
+            <a th:href="@{/facturas/{id}(id=${notaCredito.facturaAnulada.id})}" 
+               class="btn btn-info">Ver Factura Anulada</a>
+        </div>
+    </div>
+
+    <div class="nc-container">
+        <!-- Encabezado NC -->
+        <div class="nc-header">
+            <div class="nc-badge">
+                <span class="nc-icon">📄</span>
+                <div>
+                    <h2 class="nc-numero" th:text="${notaCredito.numero}">NC-2025-00000001</h2>
+                    <p class="nc-tipo">NOTA DE CRÉDITO</p>
+                </div>
+            </div>
+            
+            <div class="nc-fecha">
+                <p><strong>Fecha Emisión:</strong></p>
+                <p class="fecha-valor" th:text="${#temporals.format(notaCredito.fechaEmision, 'dd/MM/yyyy')}">08/12/2025</p>
+            </div>
+        </div>
+
+        <!-- Información del Cliente -->
+        <div class="cliente-section">
+            <h3>📋 Datos del Cliente</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="label">Razón Social:</span>
+                    <span class="value" th:text="${notaCredito.cuentaCliente.cliente.razonSocial}">Cliente S.A.</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">CUIT/DNI:</span>
+                    <span class="value" th:text="${notaCredito.cuentaCliente.cliente.cuitDni}">20-12345678-9</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Condición IVA:</span>
+                    <span class="value" th:text="${notaCredito.cuentaCliente.cliente.condicionIVA}">RESPONSABLE_INSCRIPTO</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Domicilio:</span>
+                    <span class="value" th:text="${notaCredito.cuentaCliente.cliente.domicilio}">Av. Ejemplo 123</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Factura Anulada -->
+        <div class="factura-anulada-section">
+            <h3>🚫 Factura Anulada</h3>
+            <div class="factura-anulada-card">
+                <div class="factura-anulada-info">
+                    <p>
+                        <strong>Número:</strong> 
+                        <a th:href="@{/facturas/{id}(id=${notaCredito.facturaAnulada.id})}"
+                           th:text="${notaCredito.facturaAnulada.numero}"
+                           class="link-factura">2025-12-00000001</a>
+                    </p>
+                    <p>
+                        <strong>Fecha Emisión Original:</strong>
+                        <span th:text="${#temporals.format(notaCredito.facturaAnulada.fechaEmision, 'dd/MM/yyyy')}">06/12/2025</span>
+                    </p>
+                    <p>
+                        <strong>Tipo:</strong>
+                        <span class="badge-tipo-factura" 
+                              th:classappend="${'badge-' + notaCredito.facturaAnulada.tipoFactura.name().toLowerCase()}"
+                              th:text="${notaCredito.facturaAnulada.tipoFactura.descripcion}">
+                            Factura A
+                        </span>
+                    </p>
+                    <p>
+                        <strong>Estado Actual:</strong>
+                        <span class="badge-estado badge-anulada_por_nc"
+                              th:text="${notaCredito.facturaAnulada.estado}">
+                            ANULADA_POR_NC
+                        </span>
+                    </p>
+                </div>
+                <div class="factura-anulada-monto">
+                    <p class="label-monto">Monto Original</p>
+                    <p class="valor-monto" 
+                       th:text="${'$' + #numbers.formatDecimal(notaCredito.facturaAnulada.montoTotalFinal, 1, 'POINT', 2, 'COMMA')}">
+                        $10.000,00
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Motivo de Anulación -->
+        <div class="motivo-section">
+            <h3>📝 Motivo de Anulación</h3>
+            <div class="motivo-box">
+                <p th:text="${notaCredito.motivo}">
+                    Error en el importe facturado. Se corregirá con nueva factura.
+                </p>
+            </div>
+        </div>
+
+        <!-- Monto Total del Crédito -->
+        <div class="credito-section">
+            <div class="credito-card">
+                <div class="credito-header">
+                    <h3>💳 MONTO TOTAL DEL CRÉDITO</h3>
+                </div>
+                <div class="credito-monto">
+                    <span class="credito-valor" 
+                          th:text="${'$' + #numbers.formatDecimal(notaCredito.montoTotalCredito, 1, 'POINT', 2, 'COMMA')}">
+                        $10.000,00
+                    </span>
+                </div>
+                <p class="credito-nota">
+                    Este monto fue revertido de la deuda del cliente.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block th:fragment="nc-detalle-styles">
+    <style>
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .nc-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .nc-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nc-badge {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .nc-icon {
+            font-size: 3rem;
+        }
+        
+        .nc-numero {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        .nc-tipo {
+            margin: 0.25rem 0 0 0;
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        
+        .nc-fecha {
+            text-align: right;
+        }
+        
+        .fecha-valor {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0.5rem 0 0 0;
+        }
+        
+        .cliente-section,
+        .factura-anulada-section,
+        .motivo-section,
+        .credito-section {
+            background: white;
+            padding: 2rem;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+        }
+        
+        .credito-section {
+            border-radius: 0 0 12px 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .cliente-section h3,
+        .factura-anulada-section h3,
+        .motivo-section h3,
+        .credito-section h3 {
+            margin-top: 0;
+            color: #333;
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .info-item .label {
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: 600;
+        }
+        
+        .info-item .value {
+            font-size: 1rem;
+            color: #333;
+        }
+        
+        .factura-anulada-card {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .factura-anulada-info p {
+            margin: 0.5rem 0;
+        }
+        
+        .link-factura {
+            color: #2196f3;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .link-factura:hover {
+            text-decoration: underline;
+        }
+        
+        .factura-anulada-monto {
+            text-align: center;
+            padding-left: 2rem;
+            border-left: 2px solid #ffc107;
+        }
+        
+        .label-monto {
+            font-size: 0.9rem;
+            color: #666;
+            margin: 0 0 0.5rem 0;
+        }
+        
+        .valor-monto {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #f57c00;
+            margin: 0;
+        }
+        
+        .motivo-box {
+            background: #f5f5f5;
+            border-left: 4px solid #2196f3;
+            padding: 1.5rem;
+            border-radius: 4px;
+        }
+        
+        .motivo-box p {
+            margin: 0;
+            color: #333;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+        
+        .credito-card {
+            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .credito-header h3 {
+            margin: 0;
+            color: white;
+            font-size: 1.3rem;
+        }
+        
+        .credito-monto {
+            margin: 1.5rem 0;
+        }
+        
+        .credito-valor {
+            font-size: 3rem;
+            font-weight: 700;
+            display: block;
+        }
+        
+        .credito-nota {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+        
+        .badge-anulada_por_nc {
+            background: #9c27b0;
+            color: white;
+        }
+    </style>
+</th:block>
+
+</html>

@@ -244,26 +244,37 @@ public class FacturaServiceImpl implements IFacturaService {
     }
     
     @Override
-    public ResultadoFacturacionMasiva generarFacturasMasivas() {
+    public ResultadoFacturacionMasiva generarFacturasMasivas(int mes, int anio) {
         ResultadoFacturacionMasiva resultado = new ResultadoFacturacionMasiva();
         
-        System.out.println("=== INICIANDO FACTURACIÓN MASIVA ===");
+        String nombreMes = LocalDate.of(anio, mes, 1).getMonth().name();
+        System.out.println("=== INICIANDO FACTURACIÓN MASIVA: " + nombreMes + " " + anio + " ===");
+        
+        // Calcular primer y último día del mes para el filtro
+        LocalDate primerDiaMes = LocalDate.of(anio, mes, 1);
+        LocalDate ultimoDiaMes = primerDiaMes.withDayOfMonth(primerDiaMes.lengthOfMonth());
         
         // 1. Obtener todas las cuentas de clientes
         List<CuentaCliente> todasLasCuentas = cuentaClienteRepository.findAll();
         System.out.println("Total de cuentas encontradas: " + todasLasCuentas.size());
         
-        // 2. Filtrar solo las que tienen servicios activos
+        // 2. Filtrar solo las que tienen servicios activos en el período
         List<CuentaCliente> cuentasConServiciosActivos = todasLasCuentas.stream()
             .filter(cuenta -> {
                 List<ServicioContratado> serviciosActivos = servicioContratadoRepository
                     .findByCuentaClienteIdAndActivo(cuenta.getId(), true);
-                return !serviciosActivos.isEmpty();
+                
+                // Filtrar servicios que estaban activos en el mes/año seleccionado
+                long serviciosEnPeriodo = serviciosActivos.stream()
+                    .filter(sc -> !sc.getFechaInicio().isAfter(ultimoDiaMes))
+                    .count();
+                    
+                return serviciosEnPeriodo > 0;
             })
             .collect(Collectors.toList());
         
         resultado.setTotalCuentasProcesadas(cuentasConServiciosActivos.size());
-        System.out.println("Cuentas con servicios activos: " + cuentasConServiciosActivos.size());
+        System.out.println("Cuentas con servicios activos en " + nombreMes + "/" + anio + ": " + cuentasConServiciosActivos.size());
         
         // 3. Generar factura para cada cuenta
         for (CuentaCliente cuenta : cuentasConServiciosActivos) {

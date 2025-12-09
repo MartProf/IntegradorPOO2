@@ -51,11 +51,6 @@ public class Pago
     @OneToMany(mappedBy = "pago", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemPago> itemsPago = new ArrayList<>();
     
-    // Relación 1-1 con Recibo (opcional, deprecado - usar numeroRecibo)
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "recibo_id")
-    private Recibo recibo;
-    
     // MÉTODOS DE NEGOCIO
     
     /**

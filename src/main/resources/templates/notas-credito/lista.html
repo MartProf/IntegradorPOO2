@@ -1,0 +1,150 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(title='Notas de Crédito', content=~{::#nc-content}, styles=~{::nc-styles})}">
+
+<div id="nc-content">
+    <div class="page-header">
+        <h1 th:text="${titulo}">Listado de Notas de Crédito</h1>
+        <a th:href="@{/facturas}" class="btn btn-secondary">← Volver a Facturas</a>
+    </div>
+
+    <div class="info-box-nc">
+        <p>📋 Las notas de crédito documentan formalmente la anulación de facturas. 
+           Solo se pueden emitir para facturas pendientes sin pagos registrados.</p>
+    </div>
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Número NC</th>
+                    <th>Fecha Emisión</th>
+                    <th>Cliente</th>
+                    <th>Factura Anulada</th>
+                    <th>Monto Crédito</th>
+                    <th>Motivo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:if="${notasCredito.isEmpty()}">
+                    <td colspan="7" style="text-align: center; padding: 2rem; color: #666;">
+                        No hay notas de crédito registradas
+                    </td>
+                </tr>
+                <tr th:each="nc : ${notasCredito}">
+                    <td>
+                        <strong th:text="${nc.numero}">NC-2025-00000001</strong>
+                    </td>
+                    <td th:text="${#temporals.format(nc.fechaEmision, 'dd/MM/yyyy')}">08/12/2025</td>
+                    <td th:text="${nc.cuentaCliente.cliente.razonSocial}">Cliente S.A.</td>
+                    <td>
+                        <a th:href="@{/facturas/{id}(id=${nc.facturaAnulada.id})}"
+                           th:text="${nc.facturaAnulada.numero}"
+                           class="link-factura">2025-12-00000001</a>
+                    </td>
+                    <td>
+                        <strong class="monto-credito" 
+                                th:text="${'$' + #numbers.formatDecimal(nc.montoTotalCredito, 1, 'POINT', 2, 'COMMA')}">
+                            $10.000,00
+                        </strong>
+                    </td>
+                    <td>
+                        <span class="motivo-resumen" 
+                              th:text="${#strings.abbreviate(nc.motivo, 50)}"
+                              th:title="${nc.motivo}">
+                            Error en importe facturado...
+                        </span>
+                    </td>
+                    <td>
+                        <a th:href="@{/notas-credito/{id}(id=${nc.id})}"
+                           class="btn-action btn-view"
+                           title="Ver Detalle">👁️</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="summary-stats">
+        <div class="stat-card">
+            <span class="stat-label">Total Notas de Crédito:</span>
+            <span class="stat-value" th:text="${notasCredito.size()}">0</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Monto Total Creditado:</span>
+            <span class="stat-value" 
+                  th:text="${'$' + #numbers.formatDecimal(notasCredito.stream().mapToDouble(nc -> nc.montoTotalCredito).sum(), 1, 'POINT', 2, 'COMMA')}">
+                $0,00
+            </span>
+        </div>
+    </div>
+</div>
+
+<th:block th:fragment="nc-styles">
+    <style>
+        .info-box-nc {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+        }
+        
+        .info-box-nc p {
+            margin: 0;
+            color: #1565c0;
+        }
+        
+        .link-factura {
+            color: #2196f3;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .link-factura:hover {
+            text-decoration: underline;
+        }
+        
+        .monto-credito {
+            color: #f44336;
+            font-size: 1.1em;
+        }
+        
+        .motivo-resumen {
+            color: #666;
+            font-style: italic;
+            cursor: help;
+        }
+        
+        .summary-stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .stat-card {
+            flex: 1;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #333;
+        }
+    </style>
+</th:block>
+
+</html>

@@ -92,8 +92,45 @@
             </div>
         </div>
 
+        <!-- Nota de Crédito (si existe) -->
+        <div th:if="${factura.notaCredito != null}" class="nota-credito-info">
+            <div class="nc-banner">
+                <div class="nc-icon">📄</div>
+                <div class="nc-content">
+                    <h4>Esta factura fue anulada con Nota de Crédito</h4>
+                    <p>
+                        <strong>NC:</strong> 
+                        <a th:href="@{/notas-credito/{id}(id=${factura.notaCredito.id})}"
+                           th:text="${factura.notaCredito.numero}"
+                           class="nc-link">NC-2025-00000001</a>
+                    </p>
+                    <p>
+                        <strong>Fecha:</strong> 
+                        <span th:text="${#temporals.format(factura.notaCredito.fechaEmision, 'dd/MM/yyyy')}">08/12/2025</span>
+                    </p>
+                    <p>
+                        <strong>Motivo:</strong> 
+                        <span th:text="${factura.notaCredito.motivo}">Error en importe</span>
+                    </p>
+                </div>
+                <div class="nc-actions">
+                    <a th:href="@{/notas-credito/{id}(id=${factura.notaCredito.id})}"
+                       class="btn btn-info">
+                        Ver Nota de Crédito
+                    </a>
+                </div>
+            </div>
+        </div>
+
         <!-- Acciones -->
         <div class="acciones-section">
+            <!-- Botón Anular con NC (solo si está PENDIENTE y no tiene pagos) -->
+            <a th:if="${factura.estado.name() == 'PENDIENTE' && factura.itemsPago.isEmpty()}"
+               th:href="@{/notas-credito/generar/{id}(id=${factura.id})}"
+               class="btn btn-warning">
+                🚫 Anular con Nota de Crédito
+            </a>
+            
             <form th:if="${factura.estado.name() == 'PENDIENTE'}" 
                   th:action="@{/facturas/{id}/pagar(id=${factura.id})}" 
                   method="post" 
@@ -107,7 +144,7 @@
                   th:action="@{/facturas/{id}/anular(id=${factura.id})}" 
                   method="post" 
                   style="display: inline;">
-                <button type="submit" class="btn btn-danger" onclick="return confirm('¿Anular esta factura?')">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('¿Anular esta factura (sin NC)?')">
                     ✗ Anular Factura
                 </button>
             </form>
@@ -121,6 +158,75 @@
 
 <th:block th:fragment="detalle-styles">
     <link rel="stylesheet" th:href="@{/css/facturas-detalle.css}">
+    <style>
+        .nota-credito-info {
+            margin: 2rem 0;
+        }
+        
+        .nc-banner {
+            background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            box-shadow: 0 4px 12px rgba(156, 39, 176, 0.3);
+        }
+        
+        .nc-icon {
+            font-size: 3rem;
+            opacity: 0.9;
+        }
+        
+        .nc-content {
+            flex: 1;
+        }
+        
+        .nc-content h4 {
+            margin: 0 0 1rem 0;
+            font-size: 1.2rem;
+        }
+        
+        .nc-content p {
+            margin: 0.5rem 0;
+            font-size: 0.95rem;
+        }
+        
+        .nc-link {
+            color: #fff;
+            text-decoration: underline;
+            font-weight: 600;
+        }
+        
+        .nc-link:hover {
+            color: #e1bee7;
+        }
+        
+        .nc-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .btn-warning {
+            background: #ff9800;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #f57c00;
+        }
+        
+        .btn-info {
+            background: #2196f3;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background: #1976d2;
+        }
+    </style>
 </th:block>
 
 </html>
