@@ -53,6 +53,9 @@
     font-size: 1.2rem;
     cursor: pointer;
     transition: opacity 0.2s;
+    border: none;
+    background: transparent;
+    font-family: inherit;
 }
 
 .btn-action:hover {

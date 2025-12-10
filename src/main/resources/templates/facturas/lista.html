@@ -62,16 +62,20 @@
                         <a th:href="@{/facturas/{id}(id=${factura.id})}"
                            class="btn-action btn-view"
                            title="Ver Detalle">👁️</a>
-                        <a th:if="${factura.estado.name() == 'PENDIENTE'}"
-                           th:href="@{/facturas/{id}/pagar(id=${factura.id})}"
-                           class="btn-action btn-success"
-                           title="Marcar como Pagada"
-                           onclick="return confirm('¿Marcar como pagada?')">✓</a>
-                        <a th:if="${factura.estado.name() == 'PENDIENTE'}"
-                           th:href="@{/facturas/{id}/anular(id=${factura.id})}"
-                           class="btn-action btn-delete"
-                           title="Anular"
-                           onclick="return confirm('¿Anular esta factura?')">✗</a>
+                        <form th:if="${factura.estado.name() == 'PENDIENTE'}"
+                              th:action="@{/facturas/{id}/pagar(id=${factura.id})}"
+                              method="post"
+                              style="display: inline;"
+                              onsubmit="return confirm('¿Marcar como pagada?')">
+                            <button type="submit" class="btn-action btn-success" title="Marcar como Pagada">✓</button>
+                        </form>
+                        <form th:if="${factura.estado.name() == 'PENDIENTE'}"
+                              th:action="@{/facturas/{id}/anular(id=${factura.id})}"
+                              method="post"
+                              style="display: inline;"
+                              onsubmit="return confirm('¿Anular esta factura?')">
+                            <button type="submit" class="btn-action btn-delete" title="Anular">✗</button>
+                        </form>
                     </td>
                 </tr>
             </tbody>
