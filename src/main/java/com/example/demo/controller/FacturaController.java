@@ -4,6 +4,7 @@ import com.example.demo.model.Factura;
 import com.example.demo.model.enums.EstadoFactura;
 import com.example.demo.service.IFacturaService;
 import com.example.demo.service.ICuentaClienteService;
+import com.example.demo.service.IClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,6 +27,9 @@ public class FacturaController {
     @Autowired
     private ICuentaClienteService cuentaClienteService;
     
+    @Autowired
+    private IClienteService clienteService;
+    
     /**
      * Lista todas las facturas
      */
@@ -33,6 +37,7 @@ public class FacturaController {
     public String listarFacturas(Model model) {
         List<Factura> facturas = facturaService.listarTodas();
         model.addAttribute("facturas", facturas);
+        model.addAttribute("clientes", clienteService.listarTodos());
         model.addAttribute("titulo", "Listado de Facturas");
         return "facturas/lista";
     }
@@ -92,6 +97,7 @@ public class FacturaController {
             EstadoFactura estadoFactura = EstadoFactura.valueOf(estado.toUpperCase());
             List<Factura> facturas = facturaService.listarPorEstado(estadoFactura);
             model.addAttribute("facturas", facturas);
+            model.addAttribute("clientes", clienteService.listarTodos());
             model.addAttribute("titulo", "Facturas - " + estadoFactura);
             return "facturas/lista";
         } catch (IllegalArgumentException e) {
@@ -106,8 +112,32 @@ public class FacturaController {
     public String listarVencidas(Model model) {
         List<Factura> facturas = facturaService.listarFacturasVencidas();
         model.addAttribute("facturas", facturas);
+        model.addAttribute("clientes", clienteService.listarTodos());
         model.addAttribute("titulo", "Facturas Vencidas");
         return "facturas/lista";
+    }
+    
+    /**
+     * Busca facturas por cliente
+     */
+    @GetMapping("/buscar-por-cliente")
+    public String buscarPorCliente(@RequestParam Long clienteId, Model model, RedirectAttributes flash) {
+        try {
+            var cuenta = cuentaClienteService.buscarPorClienteId(clienteId);
+            if (cuenta.isPresent()) {
+                List<Factura> facturas = facturaService.listarPorCuentaCliente(cuenta.get().getId());
+                model.addAttribute("facturas", facturas);
+                model.addAttribute("clientes", clienteService.listarTodos());
+                model.addAttribute("titulo", "Facturas de " + cuenta.get().getCliente().getRazonSocial());
+                return "facturas/lista";
+            } else {
+                flash.addFlashAttribute("error", "El cliente no tiene cuenta asociada");
+                return "redirect:/facturas";
+            }
+        } catch (Exception e) {
+            flash.addFlashAttribute("error", "Error al buscar facturas: " + e.getMessage());
+            return "redirect:/facturas";
+        }
     }
     
     /**
@@ -117,6 +147,7 @@ public class FacturaController {
     public String listarPorCuenta(@PathVariable Long cuentaId, Model model) {
         List<Factura> facturas = facturaService.listarPorCuentaCliente(cuentaId);
         model.addAttribute("facturas", facturas);
+        model.addAttribute("clientes", clienteService.listarTodos());
         model.addAttribute("titulo", "Facturas de la Cuenta #" + cuentaId);
         return "facturas/lista";
     }
@@ -154,7 +185,29 @@ public class FacturaController {
     }
     
     /**
-     * Busca facturas por rango de fechas
+     * Busca facturas por rango de fechas (GET con parámetros)
+     */
+    @GetMapping("/buscar-por-fecha")
+    public String buscarPorFecha(@RequestParam String desde,
+                                  @RequestParam String hasta,
+                                  Model model,
+                                  RedirectAttributes flash) {
+        try {
+            LocalDate fechaDesde = LocalDate.parse(desde);
+            LocalDate fechaHasta = LocalDate.parse(hasta);
+            List<Factura> facturas = facturaService.listarPorRangoFechas(fechaDesde, fechaHasta);
+            model.addAttribute("facturas", facturas);
+            model.addAttribute("clientes", clienteService.listarTodos());
+            model.addAttribute("titulo", "Facturas desde " + desde + " hasta " + hasta);
+            return "facturas/lista";
+        } catch (Exception e) {
+            flash.addFlashAttribute("error", "Error al buscar facturas: " + e.getMessage());
+            return "redirect:/facturas";
+        }
+    }
+    
+    /**
+     * Muestra formulario de búsqueda por fechas (Vista antigua - mantener por compatibilidad)
      */
     @GetMapping("/buscar")
     public String buscarPorFechas(@RequestParam(required = false) String desde,
@@ -165,6 +218,7 @@ public class FacturaController {
             LocalDate fechaHasta = LocalDate.parse(hasta);
             List<Factura> facturas = facturaService.listarPorRangoFechas(fechaDesde, fechaHasta);
             model.addAttribute("facturas", facturas);
+            model.addAttribute("clientes", clienteService.listarTodos());
             model.addAttribute("titulo", "Facturas desde " + desde + " hasta " + hasta);
             return "facturas/lista";
         }

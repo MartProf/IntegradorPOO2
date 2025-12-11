@@ -39,8 +39,21 @@ public class Cliente {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CondicionFiscal condicionIVA;
+    
+    // Soft Delete
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+    private Boolean activo = true;
 
     // Relación 1-1 con CuentaCliente (Cliente es dueño)
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "cliente")
     private CuentaCliente cuentaCliente;
+    
+    // Método para soft delete
+    public void eliminar() {
+        this.activo = false;
+    }
+    
+    public void reactivar() {
+        this.activo = true;
+    }
 }

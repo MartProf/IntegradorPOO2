@@ -4,17 +4,58 @@
 <div id="facturas-content">
     <div class="page-header">
         <h1 th:text="${titulo}">Listado de Facturas</h1>
-        <a th:href="@{/facturas/generar}" class="btn btn-primary">📄 Generar Factura</a>
+        <div class="header-actions">
+            <a th:href="@{/facturas/generar}" class="btn btn-primary">📄 Generar Factura</a>
+            <a th:href="@{/facturas/generar-masivas}" class="btn btn-danger">📄 Facturación Masiva</a>
+        </div>
     </div>
 
     <!-- Filtros rápidos -->
     <div class="filter-bar">
-        <a th:href="@{/facturas}" class="filter-btn">Todas</a>
-        <a th:href="@{/facturas/estado/pendiente}" class="filter-btn">Pendientes</a>
-        <a th:href="@{/facturas/estado/pagada}" class="filter-btn">Pagadas</a>
-        <a th:href="@{/facturas/vencidas}" class="filter-btn">Vencidas</a>
-        <a th:href="@{/facturas/buscar}" class="filter-btn">Buscar por Fecha</a>
-        <a th:href="@{/facturas/generar-masivas}" class="filter-btn filter-btn-danger">📄 Facturación Masiva</a>
+        <div class="filter-section">
+            <label>Estados:</label>
+            <a th:href="@{/facturas}" class="filter-btn">Todas</a>
+            <a th:href="@{/facturas/estado/pendiente}" class="filter-btn">Pendientes</a>
+            <a th:href="@{/facturas/estado/pagada}" class="filter-btn">Pagadas</a>
+            <a th:href="@{/facturas/vencidas}" class="filter-btn filter-btn-warning">⚠️ Vencidas</a>
+        </div>
+        
+        <div class="filter-section">
+            <label>Buscar:</label>
+            <button onclick="toggleFechaFilter()" class="filter-btn">📅 Por Fecha</button>
+            <button onclick="toggleClienteFilter()" class="filter-btn">👤 Por Cliente</button>
+        </div>
+    </div>
+    
+    <!-- Filtro por Fecha (oculto por defecto) -->
+    <div id="fecha-filter" class="cliente-filter" style="display: none;">
+        <form th:action="@{/facturas/buscar-por-fecha}" method="get" class="filter-form">
+            <label for="fechaDesde">Desde:</label>
+            <input type="date" id="fechaDesde" name="desde" class="form-input" required>
+            
+            <label for="fechaHasta">Hasta:</label>
+            <input type="date" id="fechaHasta" name="hasta" class="form-input" required>
+            
+            <button type="submit" class="btn btn-primary">Buscar</button>
+            <button type="button" onclick="toggleFechaFilter()" class="btn btn-secondary">Cancelar</button>
+        </form>
+    </div>
+    
+    <!-- Filtro por Cliente (oculto por defecto) -->
+    <div id="cliente-filter" class="cliente-filter" style="display: none;">
+        <form th:action="@{/facturas/buscar-por-cliente}" method="get" class="filter-form">
+            <label for="clienteSelect">Seleccione un cliente:</label>
+            <select id="clienteSelect" name="clienteId" class="form-select" required>
+                <option value="">-- Seleccione un cliente --</option>
+                <option th:each="cliente : ${clientes}" 
+                        th:value="${cliente.id}" 
+                        th:text="${cliente.razonSocial}">
+                    Cliente
+                </option>
+            </select>
+            <button type="submit" class="btn btn-primary">Buscar</button>
+            <button type="button" onclick="toggleClienteFilter()" class="btn btn-secondary">Cancelar</button>
+        </form>
     </div>
 
     <div class="table-container">
@@ -85,6 +126,29 @@
 
 <th:block th:fragment="facturas-styles">
     <link rel="stylesheet" th:href="@{/css/facturas-lista.css}">
+    <script>
+        function toggleClienteFilter() {
+            const clienteFilter = document.getElementById('cliente-filter');
+            const fechaFilter = document.getElementById('fecha-filter');
+            
+            // Cerrar el otro filtro si está abierto
+            fechaFilter.style.display = 'none';
+            
+            // Toggle del filtro de cliente
+            clienteFilter.style.display = clienteFilter.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        function toggleFechaFilter() {
+            const clienteFilter = document.getElementById('cliente-filter');
+            const fechaFilter = document.getElementById('fecha-filter');
+            
+            // Cerrar el otro filtro si está abierto
+            clienteFilter.style.display = 'none';
+            
+            // Toggle del filtro de fecha
+            fechaFilter.style.display = fechaFilter.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
 </th:block>
 
 </html>

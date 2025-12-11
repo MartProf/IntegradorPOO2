@@ -124,31 +124,31 @@ public class FacturaServiceImpl implements IFacturaService {
     @Override
     @Transactional(readOnly = true)
     public List<Factura> listarTodas() {
-        return facturaRepository.findAll();
+        return facturaRepository.findByActivoTrue();
     }
     
     @Override
     @Transactional(readOnly = true)
     public Optional<Factura> buscarPorId(Long id) {
-        return facturaRepository.findById(id);
+        return facturaRepository.findByIdAndActivoTrue(id);
     }
     
     @Override
     @Transactional(readOnly = true)
     public List<Factura> listarPorCuentaCliente(Long cuentaClienteId) {
-        return facturaRepository.findByCuentaClienteId(cuentaClienteId);
+        return facturaRepository.findByCuentaClienteIdAndActivoTrue(cuentaClienteId);
     }
     
     @Override
     @Transactional(readOnly = true)
     public List<Factura> listarPorEstado(EstadoFactura estado) {
-        return facturaRepository.findByEstado(estado);
+        return facturaRepository.findByEstadoAndActivoTrue(estado);
     }
     
     @Override
     @Transactional(readOnly = true)
     public List<Factura> listarFacturasVencidas() {
-        return facturaRepository.findFacturasVencidas(LocalDate.now());
+        return facturaRepository.findFacturasVencidasActivas(LocalDate.now());
     }
     
     @Override
@@ -187,7 +187,7 @@ public class FacturaServiceImpl implements IFacturaService {
     
     @Override
     public Factura actualizarEstado(Long facturaId, EstadoFactura nuevoEstado) {
-        Factura factura = facturaRepository.findById(facturaId)
+        Factura factura = facturaRepository.findByIdAndActivoTrue(facturaId)
             .orElseThrow(() -> new RuntimeException("Factura no encontrada con ID: " + facturaId));
         
         factura.setEstado(nuevoEstado);

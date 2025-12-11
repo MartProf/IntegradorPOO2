@@ -20,7 +20,7 @@ public class ClienteServiceImpl implements IClienteService {
     @Override
     @Transactional(readOnly = true)
     public List<Cliente> listarTodos() {
-        return clienteRepository.findAll();
+        return clienteRepository.findByActivoTrue();
     }
 
     @Override
@@ -29,13 +29,13 @@ public class ClienteServiceImpl implements IClienteService {
         if (id == null) {
             throw new IllegalArgumentException("El ID no puede ser nulo");
         }
-        return clienteRepository.findById(id);
+        return clienteRepository.findByIdAndActivoTrue(id);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<Cliente> buscarPorCuitDni(String cuitDni) {
-        return clienteRepository.findByCuitDni(cuitDni);
+        return clienteRepository.findByCuitDniAndActivoTrue(cuitDni);
     }
 
     @Override
@@ -46,12 +46,12 @@ public class ClienteServiceImpl implements IClienteService {
         // Verificar si el CUIT/DNI ya existe (excepto si es el mismo cliente)
         if (cliente.getId() == null) {
             // Cliente nuevo
-            if (clienteRepository.existsByCuitDni(cliente.getCuitDni())) {
+            if (clienteRepository.existsByCuitDniAndActivoTrue(cliente.getCuitDni())) {
                 throw new IllegalArgumentException("Ya existe un cliente con el CUIT/DNI: " + cliente.getCuitDni());
             }
         } else {
             // Cliente existente - verificar que no haya otro con el mismo CUIT/DNI
-            Optional<Cliente> clienteExistente = clienteRepository.findByCuitDni(cliente.getCuitDni());
+            Optional<Cliente> clienteExistente = clienteRepository.findByCuitDniAndActivoTrue(cliente.getCuitDni());
             if (clienteExistente.isPresent() && !clienteExistente.get().getId().equals(cliente.getId())) {
                 throw new IllegalArgumentException("Ya existe otro cliente con el CUIT/DNI: " + cliente.getCuitDni());
             }
@@ -75,14 +75,18 @@ public class ClienteServiceImpl implements IClienteService {
         if (id == null) {
             throw new IllegalArgumentException("El ID no puede ser nulo");
         }
-        Cliente cliente = clienteRepository.findById(id)
+        Cliente cliente = clienteRepository.findByIdAndActivoTrue(id)
                 .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado con ID: " + id));
         
-        // Verificar si tiene cuenta con servicios contratados
+        // Verificar si tiene cuenta con servicios contratados activos
         if (cliente.getCuentaCliente() != null && 
-            cliente.getCuentaCliente().getServiciosContratados() != null &&
-            !cliente.getCuentaCliente().getServiciosContratados().isEmpty()) {
-            throw new IllegalArgumentException("No se puede eliminar el cliente porque tiene servicios contratados");
+            cliente.getCuentaCliente().getServiciosContratados() != null) {
+            long serviciosActivos = cliente.getCuentaCliente().getServiciosContratados().stream()
+                .filter(sc -> sc.getActivo() != null && sc.getActivo())
+                .count();
+            if (serviciosActivos > 0) {
+                throw new IllegalArgumentException("No se puede eliminar el cliente porque tiene servicios contratados activos");
+            }
         }
         
         // Verificar si tiene deuda pendiente
@@ -91,19 +95,21 @@ public class ClienteServiceImpl implements IClienteService {
             throw new IllegalArgumentException("No se puede eliminar el cliente porque tiene deuda pendiente");
         }
         
-        clienteRepository.deleteById(id);
+        // SOFT DELETE: marcar como inactivo en vez de eliminar
+        cliente.eliminar();
+        clienteRepository.save(cliente);
     }
 
     @Override
     @Transactional(readOnly = true)
     public boolean existeCuitDni(String cuitDni) {
-        return clienteRepository.existsByCuitDni(cuitDni);
+        return clienteRepository.existsByCuitDniAndActivoTrue(cuitDni);
     }
 
     @Override
     @Transactional(readOnly = true)
     public boolean existeCuitDniExcluyendoId(String cuitDni, Long idExcluir) {
-        Optional<Cliente> cliente = clienteRepository.findByCuitDni(cuitDni);
+        Optional<Cliente> cliente = clienteRepository.findByCuitDniAndActivoTrue(cuitDni);
         return cliente.isPresent() && !cliente.get().getId().equals(idExcluir);
     }
 

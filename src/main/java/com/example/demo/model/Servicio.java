@@ -36,8 +36,21 @@ public class Servicio {
     
     @Column(nullable = false)
     private Double precioBase;
+    
+    // Soft Delete
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+    private Boolean activo = true;
 
     // Relación 1-N con ServicioContratado
     @OneToMany(mappedBy = "servicio")
     private Set<ServicioContratado> contratos = new HashSet<>();
+    
+    // Métodos para soft delete
+    public void eliminar() {
+        this.activo = false;
+    }
+    
+    public void reactivar() {
+        this.activo = true;
+    }
 }

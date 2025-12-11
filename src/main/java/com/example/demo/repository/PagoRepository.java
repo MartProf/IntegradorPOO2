@@ -16,10 +16,17 @@ import java.util.Optional;
 @Repository
 public interface PagoRepository extends JpaRepository<Pago, Long> {
     
+    // Métodos para soft delete
+    List<Pago> findByActivoTrue();
+    
+    Optional<Pago> findByIdAndActivoTrue(Long id);
+    
     /**
      * Encuentra todos los pagos de una cuenta de cliente
      */
     List<Pago> findByCuentaClienteId(Long cuentaClienteId);
+    
+    List<Pago> findByCuentaClienteIdAndActivoTrue(Long cuentaClienteId);
     
     /**
      * Encuentra pagos en un rango de fechas

@@ -38,6 +38,10 @@ public class CuentaCliente
     @Column(nullable = false)
     private Double saldoAFavor = 0.0; // Crédito Fiscal
     
+    // Soft Delete
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+    private Boolean activo = true;
+    
     // Relación 1-1 inversa con Cliente
     @OneToOne
     @JoinColumn(name = "cliente_id", unique = true)

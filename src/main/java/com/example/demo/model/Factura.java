@@ -51,6 +51,10 @@ public class Factura
     @Column(nullable = false)
     private TipoFactura tipoFactura;
     
+    // Soft Delete
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+    private Boolean activo = true;
+    
     // Relación N-1 con CuentaCliente
     @ManyToOne
     @JoinColumn(name = "cuenta_cliente_id", nullable = false)

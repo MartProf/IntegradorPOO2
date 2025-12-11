@@ -19,7 +19,7 @@ public class ServicioServiceImpl implements IServicioService {
     @Override
     @Transactional(readOnly = true)
     public List<Servicio> listarTodos() {
-        return servicioRepository.findAll();
+        return servicioRepository.findByActivoTrue();
     }
 
     @Override
@@ -28,7 +28,7 @@ public class ServicioServiceImpl implements IServicioService {
         if (id == null) {
             return Optional.empty();
         }
-        return servicioRepository.findById(id);
+        return servicioRepository.findByIdAndActivoTrue(id);
     }
 
     @Override
@@ -53,17 +53,17 @@ public class ServicioServiceImpl implements IServicioService {
 
         // Verificar duplicados (solo si es un servicio nuevo o cambió el nombre)
         if (servicio.getId() == null) {
-            if (servicioRepository.existsByNombre(servicio.getNombre())) {
+            if (servicioRepository.existsByNombreAndActivoTrue(servicio.getNombre())) {
                 throw new IllegalArgumentException("Ya existe un servicio con ese nombre");
             }
         } else {
             Long servicioId = servicio.getId();
             if (servicioId != null) {
-                String nombreExistente = servicioRepository.findById(servicioId)
+                String nombreExistente = servicioRepository.findByIdAndActivoTrue(servicioId)
                         .map(Servicio::getNombre)
                         .orElse(null);
                 if (!servicio.getNombre().equals(nombreExistente)) {
-                    if (servicioRepository.existsByNombre(servicio.getNombre())) {
+                    if (servicioRepository.existsByNombreAndActivoTrue(servicio.getNombre())) {
                         throw new IllegalArgumentException("Ya existe un servicio con ese nombre");
                     }
                 }
@@ -79,9 +79,11 @@ public class ServicioServiceImpl implements IServicioService {
         if (id == null) {
             throw new IllegalArgumentException("El ID no puede ser nulo");
         }
-        if (!servicioRepository.existsById(id)) {
-            throw new IllegalArgumentException("No existe un servicio con el ID especificado");
-        }
-        servicioRepository.deleteById(id);
+        Servicio servicio = servicioRepository.findByIdAndActivoTrue(id)
+                .orElseThrow(() -> new IllegalArgumentException("No existe un servicio con el ID especificado"));
+        
+        // SOFT DELETE
+        servicio.eliminar();
+        servicioRepository.save(servicio);
     }
 }

@@ -38,6 +38,10 @@ public class NotaCredito
     
     @Column(nullable = false, length = 500)
     private String motivo; // Registro Obligatorio del motivo
+    
+    // Soft Delete
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+    private Boolean activo = true;
 
     // Relación 1-1 con Factura (CLAVE PARA TRAZABILIDAD)
     @OneToOne

@@ -17,21 +17,33 @@ import java.util.Optional;
 @Repository
 public interface FacturaRepository extends JpaRepository<Factura, Long> {
     
+    // Métodos para soft delete
+    List<Factura> findByActivoTrue();
+    
+    Optional<Factura> findByIdAndActivoTrue(Long id);
+    
     /**
      * Encuentra todas las facturas de una cuenta de cliente
      */
     List<Factura> findByCuentaClienteId(Long cuentaClienteId);
+    
+    List<Factura> findByCuentaClienteIdAndActivoTrue(Long cuentaClienteId);
     
     /**
      * Encuentra facturas por estado
      */
     List<Factura> findByEstado(EstadoFactura estado);
     
+    List<Factura> findByEstadoAndActivoTrue(EstadoFactura estado);
+    
     /**
      * Encuentra facturas vencidas y pendientes
      */
     @Query("SELECT f FROM Factura f WHERE f.fechaVencimiento < :fecha AND f.estado = 'PENDIENTE'")
     List<Factura> findFacturasVencidas(@Param("fecha") LocalDate fecha);
+    
+    @Query("SELECT f FROM Factura f WHERE f.fechaVencimiento < :fecha AND f.estado = 'PENDIENTE' AND f.activo = true")
+    List<Factura> findFacturasVencidasActivas(@Param("fecha") LocalDate fecha);
     
     /**
      * Encuentra facturas emitidas en un rango de fechas

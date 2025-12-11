@@ -26,6 +26,15 @@ public interface CuentaClienteRepository extends JpaRepository<CuentaCliente, Lo
      */
     List<CuentaCliente> findByEstado(EstadoCuenta estado);
     
+    // Métodos para soft delete
+    List<CuentaCliente> findByActivoTrue();
+    
+    Optional<CuentaCliente> findByIdAndActivoTrue(Long id);
+    
+    Optional<CuentaCliente> findByClienteIdAndActivoTrue(Long clienteId);
+    
+    List<CuentaCliente> findByEstadoAndActivoTrue(EstadoCuenta estado);
+    
     /**
      * Busca cuentas con deuda pendiente mayor a cero
      * @return Lista de cuentas con deuda

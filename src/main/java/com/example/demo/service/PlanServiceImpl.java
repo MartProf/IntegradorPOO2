@@ -24,7 +24,7 @@ public class PlanServiceImpl implements IPlanService {
     @Override
     @Transactional(readOnly = true)
     public List<Plan> listarTodos() {
-        return planRepository.findAll();
+        return planRepository.findByActivoTrue();
     }
     
     @Override
@@ -33,7 +33,7 @@ public class PlanServiceImpl implements IPlanService {
         if (id == null) {
             return Optional.empty();
         }
-        return planRepository.findById(id);
+        return planRepository.findByIdAndActivoTrue(id);
     }
     
     @Override
@@ -49,14 +49,14 @@ public class PlanServiceImpl implements IPlanService {
         
         // Verificar duplicado (solo si es nuevo o cambió el nombre)
         if (plan.getId() == null) {
-            if (planRepository.existsByNombre(plan.getNombre())) {
+            if (planRepository.existsByNombreAndActivoTrue(plan.getNombre())) {
                 throw new IllegalArgumentException("Ya existe un plan con ese nombre");
             }
         } else {
             Long planId = plan.getId();
             if (planId != null && !plan.getNombre().equals(
-                    planRepository.findById(planId).map(Plan::getNombre).orElse(""))) {
-                if (planRepository.existsByNombre(plan.getNombre())) {
+                    planRepository.findByIdAndActivoTrue(planId).map(Plan::getNombre).orElse(""))) {
+                if (planRepository.existsByNombreAndActivoTrue(plan.getNombre())) {
                     throw new IllegalArgumentException("Ya existe un plan con ese nombre");
                 }
             }
@@ -70,18 +70,20 @@ public class PlanServiceImpl implements IPlanService {
         if (id == null) {
             throw new IllegalArgumentException("El ID no puede ser nulo");
         }
-        if (!planRepository.existsById(id)) {
-            throw new IllegalArgumentException("El plan no existe");
-        }
-        planRepository.deleteById(id);
+        Plan plan = planRepository.findByIdAndActivoTrue(id)
+                .orElseThrow(() -> new IllegalArgumentException("El plan no existe"));
+        
+        // SOFT DELETE
+        plan.eliminar();
+        planRepository.save(plan);
     }
     
     @Override
     public Plan agregarServicio(Long planId, Long servicioId) {
-        Plan plan = planRepository.findById(planId)
+        Plan plan = planRepository.findByIdAndActivoTrue(planId)
                 .orElseThrow(() -> new IllegalArgumentException("Plan no encontrado con ID: " + planId));
         
-        Servicio servicio = servicioRepository.findById(servicioId)
+        Servicio servicio = servicioRepository.findByIdAndActivoTrue(servicioId)
                 .orElseThrow(() -> new IllegalArgumentException("Servicio no encontrado con ID: " + servicioId));
         
         // Verificar que no esté ya incluido
@@ -95,10 +97,10 @@ public class PlanServiceImpl implements IPlanService {
     
     @Override
     public Plan removerServicio(Long planId, Long servicioId) {
-        Plan plan = planRepository.findById(planId)
+        Plan plan = planRepository.findByIdAndActivoTrue(planId)
                 .orElseThrow(() -> new IllegalArgumentException("Plan no encontrado con ID: " + planId));
         
-        Servicio servicio = servicioRepository.findById(servicioId)
+        Servicio servicio = servicioRepository.findByIdAndActivoTrue(servicioId)
                 .orElseThrow(() -> new IllegalArgumentException("Servicio no encontrado con ID: " + servicioId));
         
         plan.removerServicio(servicio);
@@ -107,7 +109,7 @@ public class PlanServiceImpl implements IPlanService {
     
     @Override
     public Plan actualizarServiciosIncluidos(Long planId, List<Long> serviciosIds) {
-        Plan plan = planRepository.findById(planId)
+        Plan plan = planRepository.findByIdAndActivoTrue(planId)
                 .orElseThrow(() -> new IllegalArgumentException("Plan no encontrado con ID: " + planId));
         
         // Limpiar servicios actuales
@@ -116,7 +118,7 @@ public class PlanServiceImpl implements IPlanService {
         // Agregar nuevos servicios
         if (serviciosIds != null && !serviciosIds.isEmpty()) {
             for (Long servicioId : serviciosIds) {
-                Servicio servicio = servicioRepository.findById(servicioId)
+                Servicio servicio = servicioRepository.findByIdAndActivoTrue(servicioId)
                         .orElseThrow(() -> new IllegalArgumentException("Servicio no encontrado con ID: " + servicioId));
                 plan.agregarServicio(servicio);
             }

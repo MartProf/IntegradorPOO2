@@ -33,6 +33,10 @@ public class Plan {
     private Double precioBase;
     
     private String descripcion;
+    
+    // Soft Delete
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+    private Boolean activo = true;
 
     // Relación N-N con Servicio (servicios incluidos en el plan)
     @ManyToMany(fetch = FetchType.EAGER)
@@ -75,6 +79,15 @@ public class Plan {
     // Calcular el ahorro del plan vs servicios individuales
     public Double calcularAhorro() {
         return calcularPrecioServiciosIndividuales() - this.precioBase;
+    }
+    
+    // Métodos para soft delete
+    public void eliminar() {
+        this.activo = false;
+    }
+    
+    public void reactivar() {
+        this.activo = true;
     }
 }
 

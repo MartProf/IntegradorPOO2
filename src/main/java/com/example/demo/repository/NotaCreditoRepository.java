@@ -14,15 +14,24 @@ import java.util.Optional;
 @Repository
 public interface NotaCreditoRepository extends JpaRepository<NotaCredito, Long> {
     
+    // Métodos para soft delete
+    List<NotaCredito> findByActivoTrue();
+    
+    Optional<NotaCredito> findByIdAndActivoTrue(Long id);
+    
     /**
      * Busca una nota de crédito por su número
      */
     Optional<NotaCredito> findByNumero(String numero);
     
+    Optional<NotaCredito> findByNumeroAndActivoTrue(String numero);
+    
     /**
      * Encuentra todas las notas de crédito de una cuenta de cliente
      */
     List<NotaCredito> findByCuentaClienteId(Long cuentaClienteId);
+    
+    List<NotaCredito> findByCuentaClienteIdAndActivoTrue(Long cuentaClienteId);
     
     /**
      * Busca la nota de crédito asociada a una factura específica

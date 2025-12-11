@@ -42,6 +42,10 @@ public class Pago
     
     private String observaciones;
     
+    // Soft Delete
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+    private Boolean activo = true;
+    
     // Relación N-1 con CuentaCliente (pago realizado por una cuenta)
     @ManyToOne
     @JoinColumn(name = "cuenta_cliente_id", nullable = false)
